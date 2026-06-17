@@ -1,0 +1,49 @@
+# Python caches
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Test and coverage output
+.pytest_cache/
+.coverage
+htmlcov/
+
+# PyInstaller output
+build/
+dist/
+*.spec
+
+# Local Evidex user data
+/runs.csv
+/steps.csv
+/series.csv
+/evidex_settings.json
+/backup/
+/packs/
+# Private regression suite for the local instrument pack
+/tests/accept_test.py
+/tests/make_fixtures.py
+
+# Private development notes and one-off migration files
+/HANDOVER.md
+/START_HERE.md
+/docs/HANDOVER_HISTORY.md
+/docs/PLAN_*.md
+/update_json.py
+
+# Experimental Qt migration work lives on a separate branch for now
+/evidex_qt_app.py
+/requirements-qt.txt
+/evidex/qt_app/
+/docs/QT_MIGRATION.md
+
+# Editor and OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

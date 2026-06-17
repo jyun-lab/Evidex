@@ -1,0 +1,104 @@
+{
+  "RUN_FIELDS": [
+    "run_id",
+    "date",
+    "title",
+    "experimenter",
+    "result_summary",
+    "raw_path",
+    "photo_path",
+    "notes"
+  ],
+  "STEP_FIELDS": [
+    "run_id",
+    "step_no",
+    "action"
+  ],
+  "SERIES_FIELDS": [
+    "series_id"
+  ],
+  "COLS": [
+    [
+      "run_id",
+      110
+    ],
+    [
+      "date",
+      100
+    ],
+    [
+      "title",
+      230
+    ],
+    [
+      "result_summary",
+      360
+    ]
+  ],
+  "HEAD": {
+    "run_id": "Run ID",
+    "date": "Date",
+    "title": "Title",
+    "result_summary": "Result"
+  },
+  "LONG_FIELDS": [
+    "result_summary",
+    "notes"
+  ],
+  "HIDDEN_EDIT_FIELDS": [],
+  "JP_LABEL": {
+    "run_id": "Record ID",
+    "date": "Date",
+    "title": "Title",
+    "experimenter": "Researcher",
+    "result_summary": "Result Summary",
+    "raw_path": "Oscilloscope CSV",
+    "photo_path": "Attached Image",
+    "notes": "Notes"
+  },
+  "CHOICES": {},
+  "GCOL": {},
+  "STEP_FORM": [
+    [
+      "action",
+      "Action"
+    ]
+  ],
+  "ACTION_CHOICES": [],
+  "MEDIA_SEEDS": [
+    "photo_path"
+  ],
+  "features": {
+    "steps": false,
+    "series": false,
+    "grading": false,
+    "baseline": false
+  },
+  "waveform": {
+    "default_mode": "all",
+    "step_markers": false,
+    "modes": [
+      {
+        "id": "all",
+        "label": "Channels",
+        "y_label": "Voltage [V]",
+        "channels": "all"
+      }
+    ]
+  },
+  "facets": [],
+  "adv_filters": [
+    "date_range",
+    "experimenter"
+  ],
+  "LABEL_EN": {
+    "run_id": "Run ID",
+    "date": "Date",
+    "title": "Title",
+    "experimenter": "Researcher",
+    "result_summary": "Result Summary",
+    "raw_path": "Oscilloscope CSV",
+    "photo_path": "Attached Image",
+    "notes": "Notes"
+  }
+}

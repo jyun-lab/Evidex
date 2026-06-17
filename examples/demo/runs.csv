@@ -1,0 +1,11 @@
+run_id,date,title,experimenter,result_summary,raw_path,photo_path,notes
+SCOPE-001,2026-01-15,Probe compensation baseline,Researcher A,Two clean sine-wave channels were captured with stable trigger timing.,signals/scope_probe_baseline.csv,images/oscilloscope_capture.png,Synthetic demo record for README screenshots.
+SCOPE-002,2026-01-16,Filter response sweep,Researcher B,Amplitude decreased after the test filter while phase lag remained visible.,signals/scope_filter_response.csv,images/oscilloscope_capture.png,Synthetic oscilloscope CSV generated from sine waves.
+SCOPE-003,2026-01-17,Sensor pulse verification,Researcher A,Sensor output stayed periodic and the trigger channel marked repeatable edges.,signals/scope_sensor_pulse.csv,images/oscilloscope_capture.png,No real instrument data is included.
+SCOPE-004,2026-01-18,Trigger stability check,Researcher C,Rising-edge trigger remained locked across the captured window.,signals/scope_trigger_check.csv,images/oscilloscope_capture.png,Synthetic demonstration record.
+SCOPE-005,2026-01-19,Repeatability capture,Researcher B,Repeated acquisition produced similar channel amplitude and phase shape.,signals/scope_repeatability.csv,images/oscilloscope_capture.png,Synthetic demonstration record.
+SCOPE-006,2026-01-20,Noise floor measurement,Researcher A,Low-amplitude trace stayed above the generated noise floor threshold.,signals/scope_noise_floor.csv,images/oscilloscope_capture.png,Synthetic demonstration record.
+SCOPE-007,2026-01-21,Phase delay check,Researcher C,CH2 phase delay remained consistent across the capture window.,signals/scope_phase_delay.csv,images/oscilloscope_capture.png,Synthetic demonstration record.
+SCOPE-008,2026-01-22,Pulse edge capture,Researcher B,Trigger markers aligned with repeated rising-edge events.,signals/scope_pulse_edge.csv,images/oscilloscope_capture.png,Synthetic demonstration record.
+SCOPE-009,2026-01-23,Gain drift check,Researcher A,Channel amplitude stayed within the synthetic drift tolerance.,signals/scope_gain_drift.csv,images/oscilloscope_capture.png,Synthetic demonstration record.
+SCOPE-010,2026-01-24,Reference signal capture,Researcher C,Reference waveform stayed clean and periodic across the full record.,signals/scope_reference_signal.csv,images/oscilloscope_capture.png,Synthetic demonstration record.

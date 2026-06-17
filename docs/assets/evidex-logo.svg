@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 220" role="img" aria-labelledby="title desc">
+  <title id="title">Evidex logo</title>
+  <desc id="desc">Evidex wordmark with an abstract shrimp evidence mark.</desc>
+  <defs>
+    <linearGradient id="shell" x1="42" y1="34" x2="160" y2="168" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F2A07B"/>
+      <stop offset="1" stop-color="#D95F4A"/>
+    </linearGradient>
+  </defs>
+  <rect x="1" y="1" width="758" height="218" rx="28" fill="#FFFDF9" stroke="#E8DDD2" stroke-width="2"/>
+  <g transform="translate(34 24)">
+    <rect width="172" height="172" rx="38" fill="#FFF8F2"/>
+    <path d="M136 49c-18-17-52-16-74 2-21 17-27 47-13 66 16 20 49 20 69 3 10-8 15-18 16-29" fill="none" stroke="#20313A" stroke-width="10" stroke-linecap="round"/>
+    <path d="M132 52c-16-14-43-13-61 2-18 14-23 38-11 53 13 16 40 16 56 1 8-7 12-16 12-26" fill="url(#shell)"/>
+    <path d="M63 65c14 7 34 7 50-2M57 84c16 8 41 7 59-4M61 103c15 6 36 4 51-7" fill="none" stroke="#FFF8F2" stroke-width="6" stroke-linecap="round" opacity=".92"/>
+    <path d="M133 50c13-14 24-20 34-22M140 58c16-4 26-2 35 3" fill="none" stroke="#D95F4A" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="103" cy="58" r="4" fill="#20313A"/>
+    <path d="M36 122h18l9-17 14 30 14-46 13 33h20" fill="none" stroke="#2E7D73" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M113 134l11 11 22-25" fill="none" stroke="#20313A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g fill="#20313A">
+    <text x="240" y="104" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="58" font-weight="750" letter-spacing="0">Evidex</text>
+    <text x="244" y="145" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="22" font-weight="500" fill="#53636B" letter-spacing="0">Local-first evidence ledger for experimental data</text>
+  </g>
+  <path d="M246 166h278" stroke="#E8DDD2" stroke-width="3" stroke-linecap="round"/>
+  <path d="M246 184h30l13-20 19 34 19-53 18 39h34" fill="none" stroke="#2E7D73" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

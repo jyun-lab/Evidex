@@ -1,0 +1,21 @@
+run_id,step_no,action
+SCOPE-001,1,Connect synthetic signal source to CH1 and CH2.
+SCOPE-001,2,Capture waveform window and save CSV.
+SCOPE-002,1,Connect synthetic signal source to CH1 and CH2.
+SCOPE-002,2,Capture waveform window and save CSV.
+SCOPE-003,1,Connect synthetic signal source to CH1 and CH2.
+SCOPE-003,2,Capture waveform window and save CSV.
+SCOPE-004,1,Connect synthetic signal source to CH1 and CH2.
+SCOPE-004,2,Capture waveform window and save CSV.
+SCOPE-005,1,Connect synthetic signal source to CH1 and CH2.
+SCOPE-005,2,Capture waveform window and save CSV.
+SCOPE-006,1,Connect synthetic signal source to CH1 and CH2.
+SCOPE-006,2,Capture waveform window and save CSV.
+SCOPE-007,1,Connect synthetic signal source to CH1 and CH2.
+SCOPE-007,2,Capture waveform window and save CSV.
+SCOPE-008,1,Connect synthetic signal source to CH1 and CH2.
+SCOPE-008,2,Capture waveform window and save CSV.
+SCOPE-009,1,Connect synthetic signal source to CH1 and CH2.
+SCOPE-009,2,Capture waveform window and save CSV.
+SCOPE-010,1,Connect synthetic signal source to CH1 and CH2.
+SCOPE-010,2,Capture waveform window and save CSV.

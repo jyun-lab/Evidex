@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">Evidex mark</title>
+  <desc id="desc">A simple shrimp-shaped mark with a waveform and check mark for the Evidex project.</desc>
+  <defs>
+    <linearGradient id="shell" x1="58" y1="52" x2="198" y2="204" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F2A07B"/>
+      <stop offset="1" stop-color="#D95F4A"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="#FFF8F2"/>
+  <path d="M198 78c-27-26-76-24-108 2-31 25-39 68-18 95 23 29 72 29 101 4 14-12 22-27 24-42" fill="none" stroke="#20313A" stroke-width="14" stroke-linecap="round"/>
+  <path d="M193 82c-24-20-62-18-88 3-26 21-33 55-16 77 18 23 58 22 81 1 12-11 18-24 18-38" fill="url(#shell)"/>
+  <path d="M92 100c20 11 50 10 73-3M82 128c24 12 60 10 86-6M88 156c22 9 52 6 74-10" fill="none" stroke="#FFF8F2" stroke-width="8" stroke-linecap="round" opacity=".9"/>
+  <path d="M189 78c19-20 34-29 48-32M198 88c22-5 35-3 48 4" fill="none" stroke="#D95F4A" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="151" cy="89" r="6" fill="#20313A"/>
+  <path d="M50 180h26l13-24 20 43 20-66 18 47h28" fill="none" stroke="#2E7D73" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M161 192l15 15 31-36" fill="none" stroke="#20313A" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
