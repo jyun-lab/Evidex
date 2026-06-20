@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "evidex"
+version = "0.1.0"
+description = "Turn scattered lab files into searchable experiment evidence"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9"
+authors = [
+    { name = "Evidex contributors" },
+]
+keywords = ["laboratory", "experiment", "data-management", "csv", "desktop"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Operating System :: Microsoft :: Windows",
+]
+
+[project.optional-dependencies]
+qt = ["PySide6", "matplotlib"]
+tk = ["ttkbootstrap", "matplotlib"]
+
+[project.scripts]
+evidex = "evidex.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/jyun-lab/Evidex"
+Repository = "https://github.com/jyun-lab/Evidex"
+
+[tool.setuptools.packages.find]
+include = ["evidex*"]
+exclude = ["tests*"]
