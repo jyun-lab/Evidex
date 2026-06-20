@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Evidex 実験記録アプリ GUI (Python 3.8+)
+"""Evidex 実験記録アプリ GUI (Python 3.9+)
 
 起動: python evidex_app.py
 同じフォルダの runs.csv / steps.csv / series.csv を読み込む(無ければ
@@ -139,6 +139,14 @@ class App(tb.Window if THEMED else tk.Tk, PrefsMixin, ThemeMixin, NavMixin, Sear
         self._window_icon_status = apply_window_icon(self)
 
     def _build(self):
+        self._build_menubar()
+        self._build_search_bar()
+        self._build_filter_bar()
+        self._build_result_area()
+        self._build_statusbar()
+        self._bind_keys()
+
+    def _build_menubar(self):
         # メニューバー: ファイル操作と表示切替はここに集約
         menubar = tk.Menu(self)
         fmenu = tk.Menu(menubar, tearoff=0)
@@ -168,6 +176,7 @@ class App(tb.Window if THEMED else tk.Tk, PrefsMixin, ThemeMixin, NavMixin, Sear
         if THEMED:
             self.dark = False
 
+    def _build_search_bar(self):
         # ===== アプリヘッダ(新設) =====
         header = ttk.Frame(self, padding=(8, 4))
         header.pack(fill="x")
@@ -215,13 +224,14 @@ class App(tb.Window if THEMED else tk.Tk, PrefsMixin, ThemeMixin, NavMixin, Sear
         ttk.Button(row1, text=t("btn.preset_save"), command=self.save_preset
                    ).pack(side="left", padx=(4, 0))
 
+    def _build_filter_bar(self):
         # 詳細フィルタ(折りたたみ。pack(side="left")では左詰め固定のため
         # 各行を grid に切り替え、入力欄の列に weight=1 を設定して
         # ウィンドウ幅に追従させる。行2(フラグ)のみ checkbutton のみで pack を使用。
         # opgroupの子にし、表示時は fill="x" のみでpack(beforeを使わない)。
         # advの親自体がopgroupなので、再アンカー時のTclError(2026-06-12/
         # 06-13で踏んだ「親違いのbefore=」)が構造的に発生しない。
-        self.adv = ttk.Frame(opgroup)
+        self.adv = ttk.Frame(self._opgroup)
         adv_rows = [ttk.Frame(self.adv) for _ in range(4)]
         for r in adv_rows:
             r.pack(fill="x", pady=(4, 2))
@@ -357,6 +367,7 @@ class App(tb.Window if THEMED else tk.Tk, PrefsMixin, ThemeMixin, NavMixin, Sear
                    ).pack(side="right")
         self._filter_bar_visible = False
 
+    def _build_result_area(self):
         # ===== 結果グループ =====
         resgroup = ttk.Frame(self, padding=(0, 4, 0, 0))
         resgroup.pack(fill="both", expand=True, padx=10)
@@ -409,6 +420,17 @@ class App(tb.Window if THEMED else tk.Tk, PrefsMixin, ThemeMixin, NavMixin, Sear
         self.tree.bind("<Return>", self.show_detail)
         self.tree.bind("<Delete>", lambda e: self.delete_selected())
         self.tree.bind("<Button-3>", self.popup_menu)
+
+    def _build_statusbar(self):
+        # 下段: 件数とヒント
+        bottom = ttk.Frame(self, padding=(10, 6))
+        bottom.pack(fill="x")
+        self.count = ttk.Label(bottom, text="")
+        self.count.pack(side="left")
+        ttk.Label(bottom, foreground="#666",
+                  text=t("main.label.hint")).pack(side="right")
+
+    def _bind_keys(self):
         self.bind("<Control-n>", lambda e: self.edit_run(None))
 
         # 右クリックメニュー: 主要操作へ直行
@@ -429,14 +451,6 @@ class App(tb.Window if THEMED else tk.Tk, PrefsMixin, ThemeMixin, NavMixin, Sear
         self.menu.add_separator()
         self.menu.add_command(label=t("btn.delete"), command=self.delete_selected)
 
-        # 下段: 件数とヒント
-        bottom = ttk.Frame(self, padding=(10, 6))
-        bottom.pack(fill="x")
-        self.count = ttk.Label(bottom, text="")
-        self.count.pack(side="left")
-        ttk.Label(bottom, foreground="#666",
-                  text=t("main.label.hint")).pack(side="right")
-
         # ↑↓キーで一覧を移動(波形クリック後にフォーカスがCanvasへ移ると
         # Treeviewのクラスバインドが効かなくなるためアプリ全体で割り当てる。
         # ガード条件は _nav_list を参照)
@@ -444,6 +458,7 @@ class App(tb.Window if THEMED else tk.Tk, PrefsMixin, ThemeMixin, NavMixin, Sear
         self.bind_all("<Up>", lambda e: self._nav_list(-1))
 
     # --- Views Integration ---
+    # View関数をmixinのようにAppのメソッドとして注入し、既存APIを維持する。
     from evidex.views import edit_series, _after_series_saved, open_series_manager, _refresh_series_manager, _render_series_detail, _new_series, _delete_series, _open_run_in_main, edit_run, edit_selected, delete_selected, validate_step, save_steps, step_form, open_steps_editor, open_schema_editor
     edit_series = edit_series
     _after_series_saved = _after_series_saved
