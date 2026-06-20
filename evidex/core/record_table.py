@@ -4,11 +4,10 @@ import datetime
 from pathlib import Path
 import shutil
 
-from evidex.core import config
+from evidex.core import config, fields
 from evidex.core.attachments import split_paths
 from evidex.core.backup import prune_backups
 from evidex.core.csvio import ensure_initial_csv_files, load_with_header
-from evidex.core.fields import COLS, HEAD, RUN_FIELDS, get_label
 
 
 @dataclass(frozen=True)
@@ -37,24 +36,32 @@ class RecordFile:
 
 def default_record_columns():
     return [
-        RecordColumn(key=key, label=HEAD.get(key, key), width=int(width or 120))
-        for key, width in COLS
+        RecordColumn(
+            key=key,
+            label=fields.HEAD.get(key, key),
+            width=int(width or 120),
+        )
+        for key, width in fields.COLS
     ]
 
 
 def load_record_table(records_csv=None):
     path = Path(records_csv) if records_csv is not None else config.RECORDS_CSV
     ensure_initial_csv_files(path.parent)
-    rows, fields = load_with_header(path) if path.exists() else ([], list(RUN_FIELDS))
+    rows, field_names = (
+        load_with_header(path)
+        if path.exists()
+        else ([], list(fields.RUN_FIELDS))
+    )
     # スキーマ定義(RUN_FIELDS)にあってCSVヘッダーにない列を補完
-    for rf in RUN_FIELDS:
-        if rf not in fields:
-            fields.append(rf)
+    for rf in fields.RUN_FIELDS:
+        if rf not in field_names:
+            field_names.append(rf)
     return RecordTable(
         records_csv=path,
         columns=default_record_columns(),
         rows=rows,
-        fields=fields,
+        fields=field_names,
         mtime=path.stat().st_mtime if path.exists() else None,
     )
 
@@ -136,10 +143,10 @@ def filter_record_rows(rows, columns, query):
 
 def record_basic_items(row):
     items = []
-    for key in RUN_FIELDS:
+    for key in fields.RUN_FIELDS:
         value = row.get(key, "")
         if value:
-            items.append((get_label(key), value))
+            items.append((fields.get_label(key), value))
     return items
 
 
@@ -148,7 +155,7 @@ def record_file_groups(row):
     for key in ("raw_path", "excel_path", "photo_path"):
         paths = split_paths(row.get(key, ""))
         if paths:
-            groups.append((get_label(key), paths))
+            groups.append((fields.get_label(key), paths))
     return groups
 
 
