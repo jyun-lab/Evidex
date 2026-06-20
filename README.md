@@ -16,10 +16,17 @@ No server. No cloud. Just local files and a single EXE.
 
 Unzip, run `Evidex.exe`, done. The ZIP includes synthetic demo data so you can explore immediately.
 
-Or run from source with Python 3.8+:
+Or run from source with Python 3.9+:
 
 ```bash
-python evidex_app.py
+python -m evidex
+```
+
+This auto-detects the best backend. To choose explicitly:
+
+```bash
+python -m evidex --qt   # Qt (PySide6) — recommended
+python -m evidex --tk   # tkinter (no extra dependencies)
 ```
 
 ## Features
@@ -56,14 +63,17 @@ Original files are never moved or rewritten. Evidex stores paths and metadata so
 ### From source
 
 ```bash
-python evidex_app.py
+pip install PySide6 matplotlib
+python -m evidex
 ```
 
-For waveform previews and a polished theme, install the optional dependencies:
+Or use the tkinter backend (no extra install needed):
 
 ```bash
-pip install ttkbootstrap matplotlib
+python -m evidex --tk
 ```
+
+For a polished tkinter theme, optionally install `ttkbootstrap`.
 
 Then try the synthetic demo in [`examples/demo`](examples/demo/).
 
@@ -109,4 +119,3 @@ Output: `dist/Evidex.exe`.
 - [Releases](https://github.com/jyun-lab/Evidex/releases)
 - [Synthetic demo data](examples/demo/)
 - [Release checklist](docs/RELEASE_CHECKLIST.md)
-
