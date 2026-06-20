@@ -46,6 +46,10 @@ def load_record_table(records_csv=None):
     path = Path(records_csv) if records_csv is not None else config.RECORDS_CSV
     ensure_initial_csv_files(path.parent)
     rows, fields = load_with_header(path) if path.exists() else ([], list(RUN_FIELDS))
+    # スキーマ定義(RUN_FIELDS)にあってCSVヘッダーにない列を補完
+    for rf in RUN_FIELDS:
+        if rf not in fields:
+            fields.append(rf)
     return RecordTable(
         records_csv=path,
         columns=default_record_columns(),
