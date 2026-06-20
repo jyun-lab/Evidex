@@ -29,6 +29,9 @@ dist/
 /tests/accept_test.py
 /tests/make_fixtures.py
 
+# Codex task files (temporary, not tracked)
+/CODEX_TASK.md
+
 # Private development notes and one-off migration files
 /HANDOVER.md
 /START_HERE.md
@@ -36,11 +39,7 @@ dist/
 /docs/PLAN_*.md
 /update_json.py
 
-# Experimental Qt migration work lives on a separate branch for now
-/evidex_qt_app.py
-/requirements-qt.txt
-/evidex/qt_app/
-/docs/QT_MIGRATION.md
+# Qt app is now part of the main codebase
 
 # Editor and OS files
 .idea/
