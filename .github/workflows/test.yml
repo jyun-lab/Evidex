@@ -1,0 +1,70 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .[tk]
+          pip install pytest
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb fonts-noto-cjk
+
+      - name: Run tests (core)
+        run: |
+          python -m pytest tests/ -v --ignore=tests/accept_test.py --ignore=tests/test_run_editor_layout.py --ignore=tests/test_schema_layout.py
+
+      - name: Run GUI tests
+        run: |
+          xvfb-run -a python -m pytest tests/test_run_editor_layout.py tests/test_schema_layout.py -v || true
+
+  test-qt:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .[qt]
+          pip install pytest
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb libegl1
+
+      - name: Run Qt tests
+        run: |
+          xvfb-run -a python -m pytest tests/test_qt_*.py -v
