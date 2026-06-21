@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "evidex"
-version = "0.1.0"
+version = "0.2.0"
 description = "Turn scattered lab files into searchable experiment evidence"
 readme = "README.md"
 license = "MIT"
@@ -15,6 +15,7 @@ authors = [
 keywords = ["laboratory", "experiment", "data-management", "csv", "desktop"]
 classifiers = [
     "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -35,6 +36,8 @@ evidex = "evidex.__main__:main"
 [project.urls]
 Homepage = "https://github.com/jyun-lab/Evidex"
 Repository = "https://github.com/jyun-lab/Evidex"
+Changelog = "https://github.com/jyun-lab/Evidex/blob/main/CHANGELOG.md"
+Issues = "https://github.com/jyun-lab/Evidex/issues"
 
 [tool.setuptools.packages.find]
 include = ["evidex*"]

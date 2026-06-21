@@ -12,9 +12,12 @@ No server. No cloud. Just local files and a single EXE.
 
 ## Download
 
-**[Windows (64-bit) — Evidex-v0.1.0-win.zip](https://github.com/jyun-lab/Evidex/releases/latest/download/Evidex-v0.1.0-win.zip)**
+| Build | Download |
+|---|---|
+| Qt (PySide6) — recommended | [Evidex-Qt-v0.2.0.exe](https://github.com/jyun-lab/Evidex/releases/latest/download/Evidex-Qt-v0.2.0.exe) |
+| tkinter (lightweight) | [Evidex-v0.2.0.exe](https://github.com/jyun-lab/Evidex/releases/latest/download/Evidex-v0.2.0.exe) |
 
-Unzip, run `Evidex.exe`, done. The ZIP includes synthetic demo data so you can explore immediately.
+Download, run, done. The bundled demo data lets you explore immediately.
 
 Or run from source with Python 3.9+:
 
@@ -56,8 +59,8 @@ Original files are never moved or rewritten. Evidex stores paths and metadata so
 
 ### Windows EXE
 
-1. [Download the ZIP](https://github.com/jyun-lab/Evidex/releases/latest/download/Evidex-v0.1.0-win.zip) and extract it.
-2. Run `Evidex.exe`. The bundled demo data loads automatically.
+1. Download from the [Releases page](https://github.com/jyun-lab/Evidex/releases/latest).
+2. Run the exe. The bundled demo data loads automatically.
 3. Click a record to see its waveform and linked files.
 
 ### From source
@@ -104,11 +107,16 @@ Labs can add their own instrument-specific workflows as local user packs under `
 ## Build a Windows Executable
 
 ```bash
+# tkinter version
 pip install pyinstaller ttkbootstrap matplotlib
-python build.py
+python build.py --version
+
+# Qt version
+pip install pyinstaller PySide6 matplotlib
+python build.py --qt --version
 ```
 
-Output: `dist/Evidex.exe`.
+Output: `dist/Evidex-v0.2.0.exe` or `dist/Evidex-Qt-v0.2.0.exe`.
 
 ## License
 
@@ -117,5 +125,5 @@ Output: `dist/Evidex.exe`.
 ## Links
 
 - [Releases](https://github.com/jyun-lab/Evidex/releases)
+- [Changelog](CHANGELOG.md)
 - [Synthetic demo data](examples/demo/)
-- [Release checklist](docs/RELEASE_CHECKLIST.md)

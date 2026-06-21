@@ -65,7 +65,34 @@ if not args.qt:
             f"then run build.py again. Details: {exc}"
         )
 
-ADD_DATA = ["README.md"]
+ADD_DATA = ["README.md", "LICENSE"]
+
+# Qt builds: bundle PySide6 LGPL license notice
+if args.qt:
+    ADD_DATA.append("CHANGELOG.md")
+    try:
+        import PySide6
+
+        pyside6_dir = os.path.dirname(PySide6.__file__)
+        for license_name in ("LICENSES", "licenses"):
+            license_dir = os.path.join(pyside6_dir, license_name)
+            if os.path.isdir(license_dir):
+                break
+        else:
+            # Fall back: include the single license file if present
+            for candidate in (
+                os.path.join(pyside6_dir, "LGPL_EXCEPTION.txt"),
+                os.path.join(pyside6_dir, "LICENSE.LGPLv3"),
+            ):
+                if os.path.exists(candidate):
+                    ADD_DATA.append(candidate)
+                    break
+            license_dir = None
+
+    except ImportError:
+        license_dir = None
+        print("[WARN] PySide6 not found; LGPL license files not bundled.")
+
 LEGACY_FILES = {
     "ledger_app.html",
     "ledger.py",
@@ -111,6 +138,10 @@ for name in ADD_DATA:
     if not os.path.exists(path):
         fail(f"Bundled data file was not found: {name}")
     cmd += ["--add-data", f"{path}{SEP}."]
+
+# Bundle PySide6 license directory if found
+if args.qt and license_dir is not None:
+    cmd += ["--add-data", f"{license_dir}{SEP}PySide6_licenses"]
 
 cmd += ["--add-data", f"{ICON}{SEP}evidex{os.sep}assets"]
 cmd += [
