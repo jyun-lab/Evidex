@@ -62,7 +62,7 @@ class EvidexQtWindow(
         super().__init__()
         from evidex.core import settings as app_settings
         self.dark = app_settings.get("theme") == "dark"
-        self.setWindowTitle(t("qt.main.title"))
+        self.setWindowTitle("Evidex")
         self.resize(1100, 700)
         self.nav_view = None
         self._nav_open = {facet["field"]: False for facet in FACETS}
@@ -73,7 +73,7 @@ class EvidexQtWindow(
         self.steps_enabled = feature_enabled("steps", bool(STEP_FORM))
         self.series_enabled = feature_enabled("series", False)
 
-        self.statusBar().showMessage(t("qt.main.started"))
+        self.statusBar().showMessage(t("qt.main.ready"))
 
         root = QWidget()
         layout = QVBoxLayout(root)
@@ -122,12 +122,8 @@ class EvidexQtWindow(
         header.setContentsMargins(0, 0, 0, 0)
         header.setSpacing(10)
         header_widget.setLayout(header)
-        self.title_label = QLabel(t("qt.main.title"))
+        self.title_label = QLabel("Evidex")
         self.title_label.setStyleSheet("font-size: 20px; font-weight: 700;")
-        self.note_label = QLabel(
-            t("qt.main.preview_note")
-        )
-        self.note_label.setStyleSheet("color: #667085;")
         new_button = QPushButton(t("qt.run.add"))
         new_button.clicked.connect(self.add_new_record)
         self.series_manager_button = QPushButton(t("series.title.manager"))
@@ -135,7 +131,7 @@ class EvidexQtWindow(
         reload_button = QPushButton(t("menu.file.reload"))
         reload_button.clicked.connect(self.reload_records)
         header.addWidget(self.title_label)
-        header.addWidget(self.note_label, stretch=1)
+        header.addStretch(1)
         header.addWidget(new_button)
         header.addWidget(self.series_manager_button)
         header.addWidget(reload_button)

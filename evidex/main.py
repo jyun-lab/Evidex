@@ -397,7 +397,7 @@ class App(tb.Window if THEMED else tk.Tk, PrefsMixin, ThemeMixin, NavMixin, Sear
         self.tree = ttk.Treeview(left, columns=ids, show="headings")
         configure_treeview_rows(self.tree, getattr(self, "dark", False))
         for c, w in COLS:
-            self.tree.heading(c, text=HEAD[c],
+            self.tree.heading(c, text=get_label(c),
                               command=lambda col=c: self.sort_by(col))
             self.tree.column(c, width=w, anchor="w",
                              stretch=(c == "result_summary"))

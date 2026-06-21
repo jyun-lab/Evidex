@@ -165,8 +165,6 @@ class ThemeMixin:
             self.title_label.setStyleSheet(
                 f"font-size: 20px; font-weight: 700; color: {t['text']};"
             )
-        if hasattr(self, "note_label"):
-            self.note_label.setStyleSheet(f"color: {t['text_muted']};")
 
         # フィルタラベル
         for lbl in getattr(self, "_filter_labels", []):
