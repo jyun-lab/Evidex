@@ -92,6 +92,40 @@ class EvidexQtWindow(QMainWindow, DetailMixin, NavigationMixin, FilterMixin):
         layout.setContentsMargins(14, 12, 14, 8)
         layout.setSpacing(8)
 
+        self._build_header(layout)
+        self._build_search_bar(layout)
+        self._build_filter_panel(layout)
+
+        splitter = QSplitter(Qt.Orientation.Horizontal)
+        self._build_nav_panel(splitter)
+        self._build_table(splitter)
+        self._build_detail_panel(splitter)
+
+        splitter.setChildrenCollapsible(False)
+        splitter.setStretchFactor(0, 0)
+        splitter.setStretchFactor(1, 5)
+        splitter.setStretchFactor(2, 2)
+        layout.addWidget(splitter, stretch=1)
+        self.splitter = splitter
+
+        self.record_table = None
+        self.filtered_rows = []
+        self.current_row = None
+
+        self._build_menubar()
+        self._bind_shortcuts()
+
+        self.setCentralWidget(root)
+        self.steps_button.setVisible(self.steps_enabled)
+        self.series_manager_button.setVisible(self.series_enabled)
+
+        self._apply_theme()
+        self.reload_records()
+        self.apply_initial_splitter_sizes()
+        QApplication.instance().processEvents()
+        self.apply_initial_splitter_sizes()
+
+    def _build_header(self, layout):
         header_widget = QWidget()
         header_widget.setSizePolicy(
             QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed
@@ -119,6 +153,7 @@ class EvidexQtWindow(QMainWindow, DetailMixin, NavigationMixin, FilterMixin):
         header.addWidget(reload_button)
         layout.addWidget(header_widget)
 
+    def _build_search_bar(self, layout):
         search_widget = QWidget()
         search_widget.setSizePolicy(
             QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed
@@ -166,6 +201,7 @@ class EvidexQtWindow(QMainWindow, DetailMixin, NavigationMixin, FilterMixin):
         search_bar.addWidget(self.count_label)
         layout.addWidget(search_widget)
 
+    def _build_filter_panel(self, layout):
         # ── 詳細フィルタパネル ──
         self.adv_panel = QWidget()
         self.adv_panel.setSizePolicy(
@@ -327,8 +363,7 @@ class EvidexQtWindow(QMainWindow, DetailMixin, NavigationMixin, FilterMixin):
 
         layout.addWidget(self.adv_panel)
 
-        splitter = QSplitter(Qt.Orientation.Horizontal)
-
+    def _build_nav_panel(self, splitter):
         self.nav_panel = QWidget()
         self.nav_panel.setMinimumWidth(170)
         self.nav_panel.setMaximumWidth(240)
@@ -351,7 +386,9 @@ class EvidexQtWindow(QMainWindow, DetailMixin, NavigationMixin, FilterMixin):
         self.nav_scroll.setWidget(self.nav_content)
         nav_outer.addWidget(self.nav_scroll)
         self.nav_panel.setVisible(bool(FACETS))
+        splitter.addWidget(self.nav_panel)
 
+    def _build_table(self, splitter):
         self.table = QTableWidget()
         self.table.setAlternatingRowColors(True)
         self.table.setShowGrid(True)
@@ -377,7 +414,9 @@ class EvidexQtWindow(QMainWindow, DetailMixin, NavigationMixin, FilterMixin):
         self.table.customContextMenuRequested.connect(
             self._show_context_menu
         )
+        splitter.addWidget(self.table)
 
+    def _build_detail_panel(self, splitter):
         self.detail_panel = QWidget()
         self.detail_panel.setMinimumWidth(200)
         detail_layout = QVBoxLayout(self.detail_panel)
@@ -460,22 +499,9 @@ class EvidexQtWindow(QMainWindow, DetailMixin, NavigationMixin, FilterMixin):
         )
         detail_layout.addWidget(self.detail_action_bar)
         detail_layout.addWidget(self.detail_tabs, stretch=1)
-
-        splitter.addWidget(self.nav_panel)
-        splitter.addWidget(self.table)
         splitter.addWidget(self.detail_panel)
-        splitter.setChildrenCollapsible(False)
-        splitter.setStretchFactor(0, 0)
-        splitter.setStretchFactor(1, 5)
-        splitter.setStretchFactor(2, 2)
-        layout.addWidget(splitter, stretch=1)
 
-        self.splitter = splitter
-
-        self.record_table = None
-        self.filtered_rows = []
-        self.current_row = None
-
+    def _build_menubar(self):
         menubar = self.menuBar()
         file_menu = menubar.addMenu("ファイル(&F)")
         file_menu.addAction("開く...", self._menu_open_file)
@@ -506,10 +532,7 @@ class EvidexQtWindow(QMainWindow, DetailMixin, NavigationMixin, FilterMixin):
                 self.open_series_manager,
             )
 
-        self.setCentralWidget(root)
-        self.steps_button.setVisible(self.steps_enabled)
-        self.series_manager_button.setVisible(self.series_enabled)
-
+    def _bind_shortcuts(self):
         shortcut_specs = [
             ("Ctrl+N", self.add_new_record),
             ("Delete", self.delete_selected_record),
@@ -523,12 +546,6 @@ class EvidexQtWindow(QMainWindow, DetailMixin, NavigationMixin, FilterMixin):
             shortcut = QShortcut(QKeySequence(key), self)
             shortcut.activated.connect(callback)
             self.shortcuts.append(shortcut)
-
-        self._apply_theme()
-        self.reload_records()
-        self.apply_initial_splitter_sizes()
-        QApplication.instance().processEvents()
-        self.apply_initial_splitter_sizes()
 
     def apply_initial_splitter_sizes(self):
         nav_width = 190 if FACETS and self.nav_panel.isVisible() else 0
