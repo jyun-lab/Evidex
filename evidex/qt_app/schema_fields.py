@@ -16,16 +16,17 @@ from PySide6.QtWidgets import (
 )
 
 from evidex.core.pack_ops import _PACK_NAME_RE
+from evidex.core.i18n import t
 
 
 class SchemaFieldsMixin:
     """フィールド編集タブの UI 構築とロジック。"""
 
     _TYPE_LABELS = {
-        "text": "テキスト",
-        "number": "数値",
-        "date": "日付",
-        "choice": "選択肢",
+        "text": t("schema_editor.type_text"),
+        "number": t("schema_editor.type_number"),
+        "date": t("schema_editor.str41"),
+        "choice": t("schema_editor.choices"),
     }
     _TYPE_IDS = {value: key for key, value in _TYPE_LABELS.items()}
 
@@ -41,7 +42,7 @@ class SchemaFieldsMixin:
         self._field_table = QTableWidget()
         self._field_table.setColumnCount(5)
         self._field_table.setHorizontalHeaderLabels(
-            ["ID", "日本語名", "英語名", "入力方式", "選択肢"]
+            ["ID", t("schema_editor.str8"), t("schema_editor.english"), t("schema_editor.str9"), t("schema_editor.choices")]
         )
         self._field_table.setSelectionBehavior(
             QAbstractItemView.SelectionBehavior.SelectRows
@@ -53,10 +54,10 @@ class SchemaFieldsMixin:
         fl_layout.addWidget(self._field_table, stretch=1)
 
         field_btns = QHBoxLayout()
-        self._add_field_btn = QPushButton("追加")
+        self._add_field_btn = QPushButton(t("btn.add"))
         self._up_field_btn = QPushButton("▲")
         self._down_field_btn = QPushButton("▼")
-        self._del_field_btn = QPushButton("削除")
+        self._del_field_btn = QPushButton(t("btn.delete"))
         field_btns.addWidget(self._add_field_btn)
         field_btns.addWidget(self._up_field_btn)
         field_btns.addWidget(self._down_field_btn)
@@ -65,7 +66,7 @@ class SchemaFieldsMixin:
         fl_layout.addLayout(field_btns)
         fields_layout.addWidget(field_left, stretch=2)
 
-        field_form = QGroupBox("フィールド編集")
+        field_form = QGroupBox(t("schema_editor.str10"))
         ff_layout = QFormLayout(field_form)
         self._field_id_edit = QLineEdit()
         self._field_jp_edit = QLineEdit()
@@ -73,17 +74,17 @@ class SchemaFieldsMixin:
         self._field_type_combo = QComboBox()
         self._field_type_combo.addItems(list(self._TYPE_LABELS.values()))
         self._field_choices_edit = QLineEdit()
-        self._field_choices_edit.setPlaceholderText("カンマ区切り")
-        self._apply_field_btn = QPushButton("適用")
-        ff_layout.addRow("フィールドID:", self._field_id_edit)
-        ff_layout.addRow("日本語名:", self._field_jp_edit)
-        ff_layout.addRow("英語名:", self._field_en_edit)
-        ff_layout.addRow("入力方式:", self._field_type_combo)
-        ff_layout.addRow("選択肢:", self._field_choices_edit)
+        self._field_choices_edit.setPlaceholderText(t("schema_editor.choices"))
+        self._apply_field_btn = QPushButton(t("btn.apply"))
+        ff_layout.addRow(t("schema_editor.field_id"), self._field_id_edit)
+        ff_layout.addRow(t("schema_editor.str11"), self._field_jp_edit)
+        ff_layout.addRow(t("schema_editor.str12"), self._field_en_edit)
+        ff_layout.addRow(t("schema_editor.str13"), self._field_type_combo)
+        ff_layout.addRow(t("schema_editor.str14"), self._field_choices_edit)
         ff_layout.addRow("", self._apply_field_btn)
         fields_layout.addWidget(field_form, stretch=1)
 
-        self._tabs.addTab(fields_page, "フィールド")
+        self._tabs.addTab(fields_page, t("schema_editor.str3"))
 
     def _field_kind(self, field):
         if field in self._schema.get("CHOICES", {}):
@@ -119,7 +120,7 @@ class SchemaFieldsMixin:
                 QTableWidgetItem(
                     self._TYPE_LABELS.get(
                         self._field_kind(field),
-                        "テキスト",
+                        t("schema_editor.type_text"),
                     )
                 ),
             )
@@ -155,7 +156,7 @@ class SchemaFieldsMixin:
         )
         kind = self._field_kind(field)
         self._field_type_combo.setCurrentText(
-            self._TYPE_LABELS.get(kind, "テキスト")
+            self._TYPE_LABELS.get(kind, t("schema_editor.type_text"))
         )
         self._field_choices_edit.setText(
             ",".join(schema.get("CHOICES", {}).get(field, []))
@@ -171,15 +172,15 @@ class SchemaFieldsMixin:
         if not new_id or not _PACK_NAME_RE.fullmatch(new_id):
             QMessageBox.warning(
                 self,
-                "エラー",
-                "フィールドIDが不正です。英数字と_-のみ使用可能。",
+                t("msg.error"),
+                t("schema_editor.invalid_field_id"),
             )
             return
         if new_id != old_id and new_id in schema["RUN_FIELDS"]:
             QMessageBox.warning(
                 self,
-                "エラー",
-                "同じIDのフィールドが既に存在します。",
+                t("msg.error"),
+                t("schema_editor.duplicate_field"),
             )
             return
         schema["RUN_FIELDS"][row] = new_id
@@ -249,8 +250,8 @@ class SchemaFieldsMixin:
         if field == "run_id":
             QMessageBox.warning(
                 self,
-                "エラー",
-                "run_id は削除できません。",
+                t("msg.error"),
+                t("schema_editor.run_id_required"),
             )
             return
         schema["RUN_FIELDS"].pop(row)

@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
 from evidex.core.fields import GCOL, feature_enabled
 
 from .theme import _DARK, _LIGHT
+from evidex.core.i18n import t
 
 
 def _popout_nav_btn_ss(dark=False):
@@ -45,7 +46,7 @@ class DetailPopoutWindow(QMainWindow):
         super().__init__(parent)
         self.owner = parent
         self.idx = idx
-        self.setWindowTitle("実験記録の詳細")
+        self.setWindowTitle(t("qt.common.experiment_record_details"))
         self.resize(720, 700)
         self.setMinimumSize(560, 480)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, True)
@@ -65,7 +66,7 @@ class DetailPopoutWindow(QMainWindow):
         header.setContentsMargins(16, 10, 16, 10)
         header.setSpacing(10)
 
-        self.prev_button = QPushButton("<  前へ")
+        self.prev_button = QPushButton(t("btn.prev"))
         self.prev_button.setStyleSheet(_popout_nav_btn_ss(parent.dark))
         self.prev_button.setFixedWidth(80)
         self.prev_button.clicked.connect(lambda: self.nav(-1))
@@ -82,7 +83,7 @@ class DetailPopoutWindow(QMainWindow):
             "color: #98A2B3; font-size: 12px; background: transparent;"
         )
 
-        self.next_button = QPushButton("次へ  >")
+        self.next_button = QPushButton(t("btn.next"))
         self.next_button.setStyleSheet(_popout_nav_btn_ss(parent.dark))
         self.next_button.setFixedWidth(80)
         self.next_button.clicked.connect(lambda: self.nav(1))
@@ -119,12 +120,12 @@ class DetailPopoutWindow(QMainWindow):
         footer = QHBoxLayout(footer_widget)
         footer.setContentsMargins(16, 8, 16, 8)
         footer.setSpacing(8)
-        self.edit_button = QPushButton("記録を編集")
+        self.edit_button = QPushButton(t("btn.edit_run"))
         self.edit_button.setStyleSheet(_popout_action_btn_ss(parent.dark))
         self.edit_button.clicked.connect(self.edit_current)
         footer.addWidget(self.edit_button)
         if self.owner.steps_enabled:
-            self.steps_button = QPushButton("工程を編集")
+            self.steps_button = QPushButton(t("main.menu.edit_steps"))
             self.steps_button.setStyleSheet(_popout_action_btn_ss(parent.dark))
             self.steps_button.clicked.connect(self.edit_steps)
             footer.addWidget(self.steps_button)
@@ -151,7 +152,7 @@ class DetailPopoutWindow(QMainWindow):
             self.close()
             return
 
-        run_id = row.get("run_id", "") or "ID なし"
+        run_id = row.get("run_id", "") or t("qt.common.no_id_fe1a8f")
         self.setWindowTitle(f"{run_id} — Evidex")
         self.run_id_label.setText(run_id)
         if feature_enabled("grading"):
@@ -170,12 +171,12 @@ class DetailPopoutWindow(QMainWindow):
             page = self.tabs.widget(0)
             self.tabs.removeTab(0)
             page.deleteLater()
-        self.tabs.addTab(self.owner.build_basic_tab(row), "基本情報")
+        self.tabs.addTab(self.owner.build_basic_tab(row), t("pane.tab.basic"))
         if self.owner.steps_enabled:
-            self.tabs.addTab(self.owner.build_steps_tab(row), "工程")
-        self.tabs.addTab(self.owner.build_files_tab(row), "ファイル")
+            self.tabs.addTab(self.owner.build_steps_tab(row), t("pane.tab.steps"))
+        self.tabs.addTab(self.owner.build_files_tab(row), t("menu.file"))
         if self.owner.series_enabled:
-            self.tabs.addTab(self.owner.build_series_tab(row), "系列")
+            self.tabs.addTab(self.owner.build_series_tab(row), t("pane.tab.series"))
 
     def edit_current(self):
         row = self.current_row()

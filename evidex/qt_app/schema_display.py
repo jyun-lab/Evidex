@@ -19,6 +19,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
+from evidex.core.i18n import t
 
 
 class SchemaDisplayMixin:
@@ -32,10 +33,10 @@ class SchemaDisplayMixin:
         display_content = QWidget()
         display_layout = QVBoxLayout(display_content)
 
-        facet_group = QGroupBox("ナビゲーション ファセット")
+        facet_group = QGroupBox(t("schema_editor.facets"))
         facet_layout = QVBoxLayout(facet_group)
         facet_layout.addWidget(
-            QLabel("ナビパネルに表示するフィールドを選択:")
+            QLabel(t("schema_editor.facets_help"))
         )
         self._facet_list = QListWidget()
         self._facet_list.setSelectionMode(
@@ -44,25 +45,25 @@ class SchemaDisplayMixin:
         facet_layout.addWidget(self._facet_list)
         display_layout.addWidget(facet_group)
 
-        self._feature_group = QGroupBox("機能")
+        self._feature_group = QGroupBox(t("schema_editor.features"))
         feat_layout = QVBoxLayout(self._feature_group)
         self._feature_checks = {}
         feature_descs = {
             "steps": (
-                "工程管理",
-                "実験の各工程を記録・管理します",
+                t("schema_editor.feature_steps"),
+                t("schema_editor.feature_steps_help"),
             ),
             "series": (
-                "シリーズ管理",
-                "複数の実験をシリーズとしてグループ化します",
+                t("series.title.manager"),
+                t("schema_editor.feature_series_help"),
             ),
             "grading": (
-                "グレード評価",
-                "実験結果をA/B/Cでグレード付けします",
+                t("schema_editor.feature_grading"),
+                t("schema_editor.feature_grading_help"),
             ),
             "baseline": (
-                "ベースライン",
-                "波形のベースライン補正を有効にします",
+                t("schema_editor.feature_baseline"),
+                t("schema_editor.feature_baseline_help"),
             ),
         }
         for name, (label, description) in feature_descs.items():
@@ -76,7 +77,7 @@ class SchemaDisplayMixin:
             feat_layout.addWidget(desc_label)
         display_layout.addWidget(self._feature_group)
 
-        self._color_group = QGroupBox("Grade 色")
+        self._color_group = QGroupBox(t("schema_editor.colors"))
         color_layout = QFormLayout(self._color_group)
         self._color_edits = {}
         for grade in "ABC":
@@ -86,14 +87,14 @@ class SchemaDisplayMixin:
             color_layout.addRow(f"Grade {grade}:", edit)
         display_layout.addWidget(self._color_group)
 
-        self._apply_display_btn = QPushButton("表示設定を適用")
+        self._apply_display_btn = QPushButton(t("schema_editor.apply_screen_settings"))
         display_layout.addWidget(
             self._apply_display_btn,
             alignment=Qt.AlignmentFlag.AlignRight,
         )
 
         display_page.setWidget(display_content)
-        self._tabs.addTab(display_page, "表示設定")
+        self._tabs.addTab(display_page, t("schema_editor.str5"))
 
     def _reload_facets(self):
         self._facet_list.clear()
@@ -157,9 +158,8 @@ class SchemaDisplayMixin:
                 ):
                     QMessageBox.warning(
                         self,
-                        "エラー",
-                        f"Grade {grade} の色が不正です。"
-                        "#RRGGBB形式で入力してください。",
+                        t("msg.error"),
+                        t("schema_editor.invalid_color", grade=grade),
                     )
                     return False
                 colors[grade] = value.upper()

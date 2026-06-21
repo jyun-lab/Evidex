@@ -23,13 +23,14 @@ from evidex.core.fields import (
 )
 
 from .widgets import FilePathEditor, ScrollSafeComboBox
+from evidex.core.i18n import t
 
 
 class RecordEditDialog(QDialog):
     def __init__(self, row, fields, parent=None, base_dir=None, title=None,
                  series_choices=None):
         super().__init__(parent)
-        self.setWindowTitle(title or f"実験記録を編集: {row.get('run_id', '')}")
+        self.setWindowTitle(title or t("run.title.edit", run_id=row.get("run_id", "")))
         self.resize(720, 620)
         self.row = row
         self.base_dir = base_dir
@@ -65,8 +66,8 @@ class RecordEditDialog(QDialog):
         button_layout = QHBoxLayout(button_bar)
         button_layout.setContentsMargins(0, 8, 0, 0)
         button_layout.addStretch()
-        cancel_button = QPushButton("キャンセル")
-        save_button = QPushButton("保存")
+        cancel_button = QPushButton(t("btn.cancel"))
+        save_button = QPushButton(t("btn.save"))
         save_button.setDefault(True)
         cancel_button.clicked.connect(self.reject)
         save_button.clicked.connect(self.accept)

@@ -13,6 +13,7 @@ from .dialogs import (
     SeriesManagerDialog,
     StepsEditorDialog,
 )
+from evidex.core.i18n import t
 
 
 class RecordOpsMixin:
@@ -41,8 +42,8 @@ class RecordOpsMixin:
         if self.current_row is None or self.record_table is None:
             QMessageBox.information(
                 self,
-                "実験記録を編集",
-                "編集する実験記録を選択してください。",
+                t("qt.common.edit_experiment_record"),
+                t("qt.common.select_an_experiment_record_to_edit"),
             )
             return
         dialog = RecordEditDialog(
@@ -50,7 +51,7 @@ class RecordOpsMixin:
             self.record_table.fields,
             self,
             base_dir=self.record_table.records_csv.parent,
-            title=f"実験記録を編集: {self.current_row.get('run_id', '')}",
+            title=t("run.title.edit", run_id=self.current_row.get("run_id", "")),
             series_choices=self._known_series(),
         )
         if dialog.exec() != QDialog.DialogCode.Accepted:
@@ -73,13 +74,13 @@ class RecordOpsMixin:
         except Exception as error:
             self.current_row.clear()
             self.current_row.update(original)
-            QMessageBox.critical(self, "保存エラー", str(error))
+            QMessageBox.critical(self, t("data.msg.save_error"), str(error))
             return
         selected_run_id = updated.get("run_id", "")
         self.reload_records()
         self.select_run_id(selected_run_id)
         self.statusBar().showMessage(
-            f"実験記録「{selected_run_id}」を保存しました。", 5000
+            t("qt.run.saved", run_id=selected_run_id), 5000
         )
 
     def add_new_record(self):
@@ -94,7 +95,7 @@ class RecordOpsMixin:
             self.record_table.fields,
             self,
             base_dir=self.record_table.records_csv.parent,
-            title="新しい実験記録を追加",
+            title=t("qt.common.add_new_experiment_record"),
             series_choices=self._known_series(),
         )
         if dialog.exec() != QDialog.DialogCode.Accepted:
@@ -116,30 +117,28 @@ class RecordOpsMixin:
         except Exception as error:
             if updated in self.record_table.rows:
                 self.record_table.rows.remove(updated)
-            QMessageBox.critical(self, "保存エラー", str(error))
+            QMessageBox.critical(self, t("data.msg.save_error"), str(error))
             return
         selected_run_id = updated.get("run_id", "")
         self.reload_records()
         self.select_run_id(selected_run_id)
         self.statusBar().showMessage(
-            f"実験記録「{selected_run_id}」を追加しました。", 5000
+            t("qt.run.added", run_id=selected_run_id), 5000
         )
 
     def delete_selected_record(self):
         if self.current_row is None or self.record_table is None:
             QMessageBox.information(
                 self,
-                "実験記録を削除",
-                "削除する実験記録を選択してください。",
+                t("qt.common.delete_experiment_record"),
+                t("qt.common.select_an_experiment_record_to_delete"),
             )
             return
-        run_id = self.current_row.get("run_id", "") or "(IDなし)"
+        run_id = self.current_row.get("run_id", "") or t("pane.label.no_id")
         answer = QMessageBox.question(
             self,
-            "実験記録を削除",
-            f"実験記録「{run_id}」を削除しますか？\n\n"
-            "この操作は runs.csv から記録を削除します。\n"
-            "削除前のCSVは backup フォルダに保存されます。",
+            t("qt.common.delete_experiment_record"),
+            t("qt.run.confirm_delete", run_id=run_id),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No,
         )
@@ -158,28 +157,28 @@ class RecordOpsMixin:
         except Exception as error:
             if row not in self.record_table.rows:
                 self.record_table.rows.append(row)
-            QMessageBox.critical(self, "削除エラー", str(error))
+            QMessageBox.critical(self, t("qt.common.delete_error"), str(error))
             return
 
         self.reload_records()
         self.statusBar().showMessage(
-            f"実験記録「{run_id}」を削除しました。", 5000
+            t("qt.run.deleted", run_id=run_id), 5000
         )
 
     def edit_selected_steps(self):
         if self.current_row is None or self.record_table is None:
             QMessageBox.information(
                 self,
-                "工程を編集",
-                "工程を編集する実験記録を選択してください。",
+                t("main.menu.edit_steps"),
+                t("qt.common.select_an_experiment_record_whose_steps_you_want"),
             )
             return
         run_id = self.current_row.get("run_id", "").strip()
         if not run_id:
             QMessageBox.information(
                 self,
-                "工程を編集",
-                "run_id がない記録の工程は編集できません。",
+                t("main.menu.edit_steps"),
+                t("qt.common.steps_cannot_be_edited_for_a_record_without"),
             )
             return
         dialog = StepsEditorDialog(
@@ -189,7 +188,7 @@ class RecordOpsMixin:
         )
         if dialog.exec() == QDialog.DialogCode.Accepted:
             self.statusBar().showMessage(
-                f"工程「{run_id}」を保存しました。", 5000
+                t("qt.steps.saved", run_id=run_id), 5000
             )
 
     def open_series_manager(self):
@@ -204,4 +203,4 @@ class RecordOpsMixin:
             self.reload_records()
             if getattr(dialog, "target_run_id", ""):
                 self.select_run_id(dialog.target_run_id)
-            self.statusBar().showMessage("シリーズ管理の変更を反映しました。", 5000)
+            self.statusBar().showMessage(t("qt.common.series_manager_changes_have_been_applied"), 5000)

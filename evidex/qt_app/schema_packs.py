@@ -57,7 +57,7 @@ class SchemaPacksMixin:
         except Exception as error:
             QMessageBox.critical(
                 self,
-                "読み込みエラー",
+                t("qt.common.read_error"),
                 str(error),
             )
             return
@@ -73,12 +73,12 @@ class SchemaPacksMixin:
             self._config.DEFAULT_PACK,
         )
         self._active_label.setText(
-            "（アクティブ）"
+            t("schema_editor.active_pack_status")
             if pack_name == active_name
             else ""
         )
         self._readonly_label.setText(
-            "組み込みパック（読み取り専用）"
+            t("schema_editor.str6")
             if builtin
             else ""
         )
@@ -230,9 +230,8 @@ class SchemaPacksMixin:
             use = (
                 QMessageBox.question(
                     self,
-                    "保存完了",
-                    f"パック '{name}' を保存しました。"
-                    "このパックをアクティブにしますか？",
+                    t("schema_editor.success_title"),
+                    t("schema_editor.saved_use_pack", pack_name=name),
                 )
                 == QMessageBox.StandardButton.Yes
             )
@@ -240,22 +239,22 @@ class SchemaPacksMixin:
                 self._settings.set("active_pack", name)
                 QMessageBox.information(
                     self,
-                    "設定変更",
-                    "再起動後に反映されます。",
+                    t("qt.common.settings_changed"),
+                    t("schema_editor.restart_to_apply"),
                 )
             self._refresh_pack_list(name)
         except Exception as error:
             QMessageBox.critical(
                 self,
-                "保存エラー",
+                t("data.msg.save_error"),
                 str(error),
             )
 
     def _create_pack(self):
         name, ok = QInputDialog.getText(
             self,
-            "新規パック",
-            "パック名（英数字と_-のみ）:",
+            t("schema_editor.str37"),
+            t("schema_editor.str38"),
         )
         if not ok or not name:
             return
@@ -275,7 +274,7 @@ class SchemaPacksMixin:
         except Exception as error:
             QMessageBox.critical(
                 self,
-                "作成エラー",
+                t("qt.common.create_error"),
                 str(error),
             )
 
@@ -286,8 +285,8 @@ class SchemaPacksMixin:
         source = item.text()
         name, ok = QInputDialog.getText(
             self,
-            "パック複製",
-            f"'{source}' のコピー名（英数字と_-のみ）:",
+            t("schema_editor.str33"),
+            t("qt.schema_packs.copy_name_prompt", source=source),
         )
         if not ok or not name:
             return
@@ -297,7 +296,7 @@ class SchemaPacksMixin:
         except Exception as error:
             QMessageBox.critical(
                 self,
-                "複製エラー",
+                t("qt.common.duplicate_error"),
                 str(error),
             )
 
@@ -309,15 +308,15 @@ class SchemaPacksMixin:
         if name in registry:
             QMessageBox.warning(
                 self,
-                "エラー",
-                "組み込みパックは削除できません。",
+                t("msg.error"),
+                t("schema_editor.str30"),
             )
             return
         if (
             QMessageBox.question(
                 self,
-                "削除確認",
-                f"パック '{name}' を削除しますか？",
+                t("schema_editor.delete_title"),
+                t("schema_editor.delete_confirm", pack_name=name),
             )
             != QMessageBox.StandardButton.Yes
         ):
@@ -328,6 +327,6 @@ class SchemaPacksMixin:
         except Exception as error:
             QMessageBox.critical(
                 self,
-                "削除エラー",
+                t("qt.common.delete_error"),
                 str(error),
             )
