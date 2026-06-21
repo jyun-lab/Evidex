@@ -3,6 +3,7 @@
 from PySide6.QtGui import QColor
 
 from .theme import _DARK, _LIGHT
+from evidex.core.i18n import t
 
 
 class ThemeMixin:

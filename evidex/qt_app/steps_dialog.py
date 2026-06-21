@@ -28,12 +28,13 @@ from evidex.core.steps_table import (
 )
 
 from .widgets import ScrollSafeComboBox
+from evidex.core.i18n import t
 
 
 class StepsEditorDialog(QDialog):
     def __init__(self, run_id, records_csv, parent=None):
         super().__init__(parent)
-        self.setWindowTitle(f"工程編集 - {run_id}")
+        self.setWindowTitle(t("steps.title.edit", run_id=run_id))
         self.resize(900, 560)
         self.run_id = run_id
         self.records_csv = records_csv
@@ -45,12 +46,12 @@ class StepsEditorDialog(QDialog):
         root.setContentsMargins(14, 14, 14, 12)
         root.setSpacing(10)
 
-        title = QLabel(f"工程編集: {run_id}")
+        title = QLabel(t("steps.title.edit", run_id=run_id))
         title.setStyleSheet("font-size: 18px; font-weight: 700;")
         root.addWidget(title)
 
         hint = QLabel(
-            "この実験記録に紐づく工程を表で編集します。No は保存時に上から順番で自動採番されます。"
+            t("qt.common.edit_the_steps_linked_to_this_experiment_record")
         )
         hint.setWordWrap(True)
         hint.setStyleSheet("color: #667085;")
@@ -58,7 +59,7 @@ class StepsEditorDialog(QDialog):
 
         if not self.form_fields:
             empty = QLabel(
-                "このパックには工程項目が定義されていません。工程を使うには、パック設定で工程項目を追加してください。"
+                t("qt.common.this_pack_does_not_define_any_step_fields")
             )
             empty.setWordWrap(True)
             empty.setStyleSheet(
@@ -68,7 +69,7 @@ class StepsEditorDialog(QDialog):
             root.addWidget(empty, stretch=1)
             close_bar = QHBoxLayout()
             close_bar.addStretch()
-            close_button = QPushButton("閉じる")
+            close_button = QPushButton(t("btn.close"))
             close_button.clicked.connect(self.reject)
             close_bar.addWidget(close_button)
             root.addLayout(close_bar)
@@ -108,11 +109,11 @@ class StepsEditorDialog(QDialog):
         root.addWidget(self.table, stretch=1)
 
         button_row = QHBoxLayout()
-        self.add_button = QPushButton("工程を追加")
-        self.edit_button = QPushButton("選択した工程を編集")
-        self.delete_button = QPushButton("選択した工程を削除")
-        self.up_button = QPushButton("上へ")
-        self.down_button = QPushButton("下へ")
+        self.add_button = QPushButton(t("qt.common.add_step"))
+        self.edit_button = QPushButton(t("qt.common.edit_selected_step"))
+        self.delete_button = QPushButton(t("qt.common.delete_selected_step"))
+        self.up_button = QPushButton(t("btn.up"))
+        self.down_button = QPushButton(t("btn.down"))
         for button, slot in [
             (self.add_button, self.add_step),
             (self.edit_button, self.edit_step),
@@ -127,8 +128,8 @@ class StepsEditorDialog(QDialog):
 
         footer = QHBoxLayout()
         footer.addStretch()
-        cancel_button = QPushButton("キャンセル")
-        save_button = QPushButton("保存")
+        cancel_button = QPushButton(t("btn.cancel"))
+        save_button = QPushButton(t("btn.save"))
         save_button.setDefault(True)
         cancel_button.clicked.connect(self.reject)
         save_button.clicked.connect(self.save)
@@ -206,7 +207,7 @@ class StepsEditorDialog(QDialog):
     def edit_step(self):
         index = self.selected_index()
         if index is None:
-            QMessageBox.information(self, "工程を編集", "編集する工程を選択してください。")
+            QMessageBox.information(self, t("main.menu.edit_steps"), t("steps.msg.select_edit"))
             return
         dialog = StepEditDialog(dict(self.steps[index]), self)
         if dialog.exec() != QDialog.DialogCode.Accepted:
@@ -217,7 +218,7 @@ class StepsEditorDialog(QDialog):
     def delete_step(self):
         index = self.selected_index()
         if index is None:
-            QMessageBox.information(self, "工程を削除", "削除する工程を選択してください。")
+            QMessageBox.information(self, t("qt.common.delete_step"), t("steps.msg.select_delete"))
             return
         del self.steps[index]
         self.refresh_table(index)
@@ -252,7 +253,7 @@ class StepsEditorDialog(QDialog):
                 self.mtime,
             )
         except Exception as error:
-            QMessageBox.critical(self, "保存エラー", str(error))
+            QMessageBox.critical(self, t("data.msg.save_error"), str(error))
             return
         self.accept()
 
@@ -260,7 +261,7 @@ class StepsEditorDialog(QDialog):
 class StepEditDialog(QDialog):
     def __init__(self, step, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("工程を編集")
+        self.setWindowTitle(t("main.menu.edit_steps"))
         self.resize(520, 420)
         self.step = step
         self.widgets = {}
@@ -283,8 +284,8 @@ class StepEditDialog(QDialog):
 
         footer = QHBoxLayout()
         footer.addStretch()
-        cancel_button = QPushButton("キャンセル")
-        save_button = QPushButton("保存")
+        cancel_button = QPushButton(t("btn.cancel"))
+        save_button = QPushButton(t("btn.save"))
         save_button.setDefault(True)
         cancel_button.clicked.connect(self.reject)
         save_button.clicked.connect(self.accept)
@@ -325,6 +326,6 @@ class StepEditDialog(QDialog):
         try:
             validate_step_update(data)
         except Exception as error:
-            QMessageBox.critical(self, "入力エラー", str(error))
+            QMessageBox.critical(self, t("msg.input_error"), str(error))
             return
         super().accept()

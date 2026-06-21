@@ -43,7 +43,7 @@ class SchemaAdapterMixin:
         adapter_layout.addWidget(self._current_settings_label)
 
         csv_row = QHBoxLayout()
-        self._choose_csv_btn = QPushButton("CSVを選択...")
+        self._choose_csv_btn = QPushButton(t("schema_editor.choose_csv"))
         self._csv_path_label = QLabel("")
         self._csv_info_label = QLabel("")
         self._csv_info_label.setStyleSheet("color: #777;")
@@ -53,16 +53,16 @@ class SchemaAdapterMixin:
         adapter_layout.addLayout(csv_row)
 
         opt_row = QHBoxLayout()
-        opt_row.addWidget(QLabel("スキップ行数:"))
+        opt_row.addWidget(QLabel(t("schema_editor.str20")))
         self._skip_rows_edit = QLineEdit("0")
         self._skip_rows_edit.setFixedWidth(60)
         opt_row.addWidget(self._skip_rows_edit)
-        opt_row.addWidget(QLabel("区切り文字:"))
+        opt_row.addWidget(QLabel(t("schema_editor.str21")))
         self._delimiter_combo = QComboBox()
         self._delimiter_combo.addItems([",", ";", "\\t"])
         self._delimiter_combo.setFixedWidth(80)
         opt_row.addWidget(self._delimiter_combo)
-        self._reload_cols_btn = QPushButton("列を再読込")
+        self._reload_cols_btn = QPushButton(t("schema_editor.reload_columns"))
         opt_row.addWidget(self._reload_cols_btn)
         opt_row.addStretch()
         adapter_layout.addLayout(opt_row)
@@ -72,45 +72,44 @@ class SchemaAdapterMixin:
         self._python_adapter_note.setStyleSheet("color: #555;")
         adapter_layout.addWidget(self._python_adapter_note)
 
-        x_group = QGroupBox("X軸設定")
+        x_group = QGroupBox(t("schema_editor.x_axis_settings"))
         x_layout = QFormLayout(x_group)
         self._x_column_combo = QComboBox()
         self._x_name_edit = QLineEdit()
         self._x_unit_edit = QLineEdit()
-        x_layout.addRow("X軸列:", self._x_column_combo)
-        x_layout.addRow("軸名:", self._x_name_edit)
-        x_layout.addRow("単位:", self._x_unit_edit)
+        x_layout.addRow(t("schema_editor.str16"), self._x_column_combo)
+        x_layout.addRow(t("schema_editor.x_name"), self._x_name_edit)
+        x_layout.addRow(t("schema_editor.channel_unit"), self._x_unit_edit)
         adapter_layout.addWidget(x_group)
 
-        ch_group = QGroupBox("チャンネル設定")
+        ch_group = QGroupBox(t("schema_editor.channel_settings"))
         ch_layout = QVBoxLayout(ch_group)
         ch_layout.addWidget(
             QLabel(
-                "X軸列以外の列がチャンネル候補になります。"
-                "チェックした列を使用します。"
+                t("schema_editor.channel_help")
             )
         )
 
         self._channel_table = QTableWidget()
         self._channel_table.setColumnCount(3)
-        self._channel_table.setHorizontalHeaderLabels(["使用", "列名", "単位"])
+        self._channel_table.setHorizontalHeaderLabels([t("qt.common.use"), t("schema_editor.channel_column"), t("schema_editor.channel_unit")])
         self._channel_table.horizontalHeader().setStretchLastSection(True)
         self._channel_table.setColumnWidth(0, 40)
         self._channel_table.setColumnWidth(1, 200)
         ch_layout.addWidget(self._channel_table, stretch=1)
 
         ch_btns = QHBoxLayout()
-        self._ch_select_all = QPushButton("全選択")
-        self._ch_clear_all = QPushButton("全解除")
+        self._ch_select_all = QPushButton(t("schema_editor.select_all"))
+        self._ch_clear_all = QPushButton(t("schema_editor.clear_selection"))
         ch_btns.addWidget(self._ch_select_all)
         ch_btns.addWidget(self._ch_clear_all)
 
         ch_unit_row = QHBoxLayout()
-        ch_unit_row.addWidget(QLabel("選択列の単位:"))
+        ch_unit_row.addWidget(QLabel(t("schema_editor.channel_unit")))
         self._ch_unit_edit = QLineEdit()
         self._ch_unit_edit.setFixedWidth(100)
         ch_unit_row.addWidget(self._ch_unit_edit)
-        self._ch_apply_unit = QPushButton("適用")
+        self._ch_apply_unit = QPushButton(t("btn.apply"))
         ch_unit_row.addWidget(self._ch_apply_unit)
         ch_unit_row.addStretch()
         ch_btns.addStretch()
@@ -119,15 +118,15 @@ class SchemaAdapterMixin:
         adapter_layout.addWidget(ch_group)
 
         adapter_btns = QHBoxLayout()
-        self._apply_adapter_btn = QPushButton("設定を適用")
-        self._test_adapter_btn = QPushButton("テスト読込")
+        self._apply_adapter_btn = QPushButton(t("schema_editor.str27"))
+        self._test_adapter_btn = QPushButton(t("schema_editor.str25"))
         adapter_btns.addWidget(self._apply_adapter_btn)
         adapter_btns.addWidget(self._test_adapter_btn)
         adapter_btns.addStretch()
         adapter_layout.addLayout(adapter_btns)
 
         adapter_page.setWidget(adapter_content)
-        self._tabs.addTab(adapter_page, "アダプター設定")
+        self._tabs.addTab(adapter_page, t("schema_editor.str4"))
 
     def _delimiter_value(self):
         value = self._delimiter_combo.currentText()
@@ -145,8 +144,8 @@ class SchemaAdapterMixin:
         except ValueError:
             QMessageBox.warning(
                 self,
-                "エラー",
-                "スキップ行数は0以上の整数を指定してください。",
+                t("msg.error"),
+                t("schema_editor.invalid_skip"),
             )
             return None
 
@@ -196,7 +195,7 @@ class SchemaAdapterMixin:
         if not path:
             path, _ = QFileDialog.getOpenFileName(
                 self,
-                "CSVファイルを選択",
+                t("schema_editor.choose_csv"),
                 "",
                 "CSV Files (*.csv);;All Files (*)",
             )
@@ -216,7 +215,7 @@ class SchemaAdapterMixin:
         except Exception as error:
             QMessageBox.critical(
                 self,
-                "読み込みエラー",
+                t("qt.common.read_error"),
                 str(error),
             )
             return False
@@ -226,8 +225,7 @@ class SchemaAdapterMixin:
             self._delimiter_label(inspected["delimiter"])
         )
         self._csv_info_label.setText(
-            f"エンコーディング: {inspected['encoding']}, "
-            f"列数: {len(inspected['header'])}"
+            t("qt.schema_adapter.csv_info", encoding=inspected["encoding"], columns=len(inspected["header"]))
         )
         self._adapter_headers = list(inspected["header"])
         previous_x = self._x_column_combo.currentText()
@@ -293,8 +291,8 @@ class SchemaAdapterMixin:
         if not x_column or not channels:
             QMessageBox.warning(
                 self,
-                "エラー",
-                "X軸列とチャンネル列を1つ以上選択してください。",
+                t("msg.error"),
+                t("schema_editor.adapter_columns_required"),
             )
             return False
         skip = self._parse_skip_rows()
@@ -304,8 +302,8 @@ class SchemaAdapterMixin:
         if len(delimiter) != 1:
             QMessageBox.warning(
                 self,
-                "エラー",
-                "区切り文字は1文字にしてください。",
+                t("msg.error"),
+                t("schema_editor.invalid_delimiter"),
             )
             return False
 
@@ -367,13 +365,12 @@ class SchemaAdapterMixin:
                 signal = parse_with_config(path, self._adapter)
             QMessageBox.information(
                 self,
-                "テスト成功",
-                f"読込成功: {len(signal.x.values)}ポイント, "
-                f"{len(signal.channels)}チャンネル",
+                t("qt.common.test_successful"),
+                t("qt.schema_adapter.test_success", points=len(signal.x.values), channels=len(signal.channels)),
             )
         except Exception as error:
             QMessageBox.critical(
                 self,
-                "テスト失敗",
+                t("qt.common.test_failed"),
                 str(error),
             )

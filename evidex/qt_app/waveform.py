@@ -25,6 +25,7 @@ from evidex.core.filtering import fnum
 from evidex.core.record_table import resolve_record_file_path
 from evidex.core.steps_table import load_steps_table
 from evidex.packs import active_pack
+from evidex.core.i18n import t
 
 try:
     from matplotlib.figure import Figure
@@ -117,7 +118,7 @@ class RawDataPreviewWidget(QWidget):
 
         if not self.files:
             message = QLabel(
-                "raw_path にCSVが登録されていません。実験記録を編集してCSVを追加すると、ここに表とグラフが表示されます。"
+                t("qt.common.no_csv_is_registered_in_raw_path_edit")
             )
             message.setWordWrap(True)
             message.setStyleSheet("color: #667085;")
@@ -131,7 +132,7 @@ class RawDataPreviewWidget(QWidget):
         for path in self.files:
             self.file_combo.addItem(path.name, str(path))
         self.file_combo.currentIndexChanged.connect(self.load_selected_file)
-        self.open_button = QPushButton("開く")
+        self.open_button = QPushButton(t("qt.common.open"))
         self.open_button.clicked.connect(self.open_selected_file)
         top.addWidget(self.file_combo, stretch=1)
         top.addWidget(self.open_button)
@@ -181,7 +182,7 @@ class RawDataPreviewWidget(QWidget):
         top.setContentsMargins(0, 0, 0, 0)
         top.setSpacing(6)
         if len(self.modes) > 1:
-            top.addWidget(QLabel("表示"))
+            top.addWidget(QLabel(t("menu.view")))
             for mode in self.modes:
                 button = QPushButton(mode.get("label", mode.get("id", "all")))
                 button.setCheckable(True)
@@ -192,11 +193,11 @@ class RawDataPreviewWidget(QWidget):
                 self.mode_buttons[mode.get("id", "all")] = button
                 top.addWidget(button)
         if feature_enabled("baseline"):
-            self.base_button = QPushButton("基準補正")
+            self.base_button = QPushButton(t("wave.btn.base_correction"))
             self.base_button.setCheckable(True)
             self.base_button.clicked.connect(self.toggle_base)
             top.addWidget(self.base_button)
-        self.axis_button = QPushButton("軸設定 ▸")
+        self.axis_button = QPushButton(t("wave.btn.axis_closed"))
         self.axis_button.clicked.connect(self.toggle_axis_panel)
         top.addWidget(self.axis_button)
         top.addStretch()
@@ -207,8 +208,8 @@ class RawDataPreviewWidget(QWidget):
         axis_layout.setContentsMargins(0, 0, 0, 0)
         axis_layout.setSpacing(4)
         for items in (
-            [("xmin", "X最小"), ("xmax", "X最大"), ("xstep", "X刻み")],
-            [("ymin", "Y最小"), ("ymax", "Y最大"), ("ystep", "Y刻み")],
+            [("xmin", t("wave.field.xmin")), ("xmax", t("wave.field.xmax")), ("xstep", t("wave.field.xstep"))],
+            [("ymin", t("wave.field.ymin")), ("ymax", t("wave.field.ymax")), ("ystep", t("wave.field.ystep"))],
         ):
             row = QHBoxLayout()
             row.setContentsMargins(0, 0, 0, 0)
@@ -221,13 +222,13 @@ class RawDataPreviewWidget(QWidget):
             row.addStretch()
             axis_layout.addLayout(row)
         buttons = QHBoxLayout()
-        apply_button = QPushButton("適用")
-        auto_button = QPushButton("自動")
+        apply_button = QPushButton(t("btn.apply"))
+        auto_button = QPushButton(t("btn.auto"))
         apply_button.clicked.connect(self.apply_axis_settings)
         auto_button.clicked.connect(self.clear_axis_settings)
         buttons.addWidget(apply_button)
         buttons.addWidget(auto_button)
-        hint = QLabel("空欄は自動。刻みは正の数だけ有効です。")
+        hint = QLabel(t("wave.msg.axis_hint"))
         hint.setStyleSheet("color: #667085;")
         buttons.addWidget(hint)
         buttons.addStretch()
@@ -260,7 +261,7 @@ class RawDataPreviewWidget(QWidget):
     def toggle_axis_panel(self):
         self.axis_open = not self.axis_open
         self.axis_panel.setVisible(self.axis_open)
-        self.axis_button.setText("軸設定 ▾" if self.axis_open else "軸設定 ▸")
+        self.axis_button.setText(t("wave.btn.axis_open") if self.axis_open else t("wave.btn.axis_closed"))
 
     def apply_axis_settings(self):
         self.axis_settings = {
@@ -296,11 +297,11 @@ class RawDataPreviewWidget(QWidget):
         self.preview_table.setColumnCount(0)
         self.plot.set_signal(None)
         if path is None:
-            self.status_label.setText("CSVが選択されていません。")
+            self.status_label.setText(t("qt.common.no_csv_is_selected"))
             self.open_button.setEnabled(False)
             return
         if not path.exists():
-            self.status_label.setText(f"CSVが見つかりません: {path}")
+            self.status_label.setText(t("wave.msg.not_found", path=path))
             self.open_button.setEnabled(False)
             return
         self.open_button.setEnabled(True)
@@ -309,30 +310,29 @@ class RawDataPreviewWidget(QWidget):
             preview = load_csv_preview(path)
             self.populate_csv_table(preview)
             table_message = (
-                f"{path.name}  |  {preview.total_rows} 行中 "
-                f"{len(preview.rows)} 行を表示  |  encoding={preview.encoding}"
+                t("qt.waveform.preview_summary", file=path.name, total=preview.total_rows, shown=len(preview.rows), encoding=preview.encoding)
             )
         except Exception as error:
             preview = None
-            table_message = f"CSV表プレビューを作れませんでした: {error}"
+            table_message = t("qt.waveform.preview_error", error=error)
 
         if not MPL_AVAILABLE:
             self.plot.set_message(
-                "高品質グラフ表示には matplotlib が必要です。"
+                t("qt.common.matplotlib_is_required_for_high_quality_graph_display")
             )
-            graph_message = "グラフ: matplotlib が未インストールです"
+            graph_message = t("qt.common.graph_matplotlib_is_not_installed")
         else:
             try:
                 signal = active_pack().parse(path)
                 self.current_signal = signal
                 self.redraw_current_signal()
                 channels = ", ".join(channel.name for channel in signal.channels[:4])
-                graph_message = f"グラフ: {signal.x.name} を横軸に {channels} を表示"
+                graph_message = t("qt.waveform.graph_status", x_name=signal.x.name, channels=channels)
             except Exception as error:
                 self.plot.set_message(
-                    "このCSVは現在のパックのグラフ設定では読み込めません。表プレビューで中身を確認できます。"
+                    t("qt.common.this_csv_cannot_be_read_with_the_current")
                 )
-                graph_message = f"グラフ: 読み込み不可 ({error})"
+                graph_message = t("qt.waveform.graph_read_error", error=error)
 
         self.status_label.setText(f"{table_message}\n{graph_message}")
 
@@ -368,8 +368,7 @@ class SignalPlotWidget(QWidget):
 
         if not MPL_AVAILABLE:
             self.message_label = QLabel(
-                "高品質グラフ表示には matplotlib が必要です。\n"
-                "次のコマンドで追加できます: python -m pip install matplotlib"
+                t("qt.common.matplotlib_is_required_for_high_quality_graph_display_48f02c")
             )
             self.message_label.setWordWrap(True)
             self.message_label.setStyleSheet(
@@ -388,7 +387,7 @@ class SignalPlotWidget(QWidget):
         self.click_label.setStyleSheet("color: #667085; font-size: 11px;")
         layout.addWidget(self.click_label)
         self.canvas.mpl_connect("button_press_event", self.on_plot_clicked)
-        self.set_message("CSVを選択すると、ここにmatplotlibグラフが表示されます。")
+        self.set_message(t("qt.common.select_a_csv_file_to_display_a_matplotlib"))
 
     def set_signal(
         self,
@@ -402,7 +401,7 @@ class SignalPlotWidget(QWidget):
         if not MPL_AVAILABLE:
             return
         if signal is None:
-            self.set_message("CSVを選択すると、ここにmatplotlibグラフが表示されます。")
+            self.set_message(t("qt.common.select_a_csv_file_to_display_a_matplotlib"))
             return
         self.draw_signal(
             signal,
@@ -460,12 +459,12 @@ class SignalPlotWidget(QWidget):
             if name in all_channels and all_channels[name].values
         ]
         if not x_values or not channels:
-            self.set_message("グラフにできる数値データがありません。")
+            self.set_message(t("qt.common.there_is_no_numeric_data_to_graph"))
             return
 
         min_len = min([len(x_values), *(len(channel.values) for channel in channels)])
         if min_len < 2:
-            self.set_message("グラフにできる数値データが足りません。")
+            self.set_message(t("qt.common.there_is_not_enough_numeric_data_to_graph"))
             return
 
         x_values = x_values[:min_len]
@@ -475,7 +474,7 @@ class SignalPlotWidget(QWidget):
         self.click_offset = offset
         if spm is not None:
             self.click_label.setText(
-                "グラフをクリックすると、対応するCSV行番号をクリップボードへコピーします。"
+                t("qt.common.click_the_graph_to_copy_the_corresponding_csv")
             )
         else:
             self.click_label.setText("")
@@ -496,14 +495,14 @@ class SignalPlotWidget(QWidget):
                 base_offsets[channel.name] = channel.values[base_index]
             if base_row is not None:
                 axis.set_title(
-                    f"基準: 行{int(base_row)}",
+                    t("wave.label.base_row", row=int(base_row)),
                     fontsize=8,
                     loc="left",
                     color="#667085",
                 )
             else:
                 axis.set_title(
-                    "基準: 先頭サンプル",
+                    t("wave.label.base_head"),
                     fontsize=8,
                     loc="left",
                     color="#667085",
@@ -654,5 +653,5 @@ class SignalPlotWidget(QWidget):
         )
         QApplication.clipboard().setText(str(row_number))
         self.click_label.setText(
-            f"x={event.xdata:.3g} -> CSV行 {row_number} をコピーしました。"
+            t("qt.waveform.row_copied", x=event.xdata, row=row_number)
         )

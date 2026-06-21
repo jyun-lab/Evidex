@@ -16,6 +16,7 @@ from .schema_adapter import SchemaAdapterMixin
 from .schema_display import SchemaDisplayMixin
 from .schema_fields import SchemaFieldsMixin
 from .schema_packs import SchemaPacksMixin
+from evidex.core.i18n import t
 
 
 class SchemaEditorDialog(
@@ -41,7 +42,7 @@ class SchemaEditorDialog(
         self._adapter_headers = []
         self._channel_units_map = {}
 
-        self.setWindowTitle("パック管理")
+        self.setWindowTitle(t("schema_editor.str1"))
         self.resize(960, 640)
         self.setMinimumSize(680, 480)
 
@@ -61,7 +62,7 @@ class SchemaEditorDialog(
         left_layout = QVBoxLayout(left)
         left_layout.setContentsMargins(0, 0, 0, 0)
 
-        left_layout.addWidget(QLabel("パック一覧"))
+        left_layout.addWidget(QLabel(t("schema_editor.str2")))
 
         self._pack_list = QListWidget()
         self._pack_list.setSelectionMode(
@@ -70,9 +71,9 @@ class SchemaEditorDialog(
         left_layout.addWidget(self._pack_list, stretch=1)
 
         btn_row1 = QHBoxLayout()
-        self._new_btn = QPushButton("新規作成")
-        self._dup_btn = QPushButton("複製")
-        self._del_btn = QPushButton("削除")
+        self._new_btn = QPushButton(t("schema_editor.str44"))
+        self._dup_btn = QPushButton(t("schema_editor.str33"))
+        self._del_btn = QPushButton(t("btn.delete"))
         btn_row1.addWidget(self._new_btn)
         btn_row1.addWidget(self._dup_btn)
         btn_row1.addWidget(self._del_btn)
@@ -87,7 +88,7 @@ class SchemaEditorDialog(
         right_layout.setContentsMargins(0, 0, 0, 0)
 
         top_row = QHBoxLayout()
-        top_row.addWidget(QLabel("編集中:"))
+        top_row.addWidget(QLabel(t("schema_editor.pack_to_edit")))
         self._pack_name_label = QLabel("")
         self._pack_name_label.setStyleSheet("font-weight: bold;")
         top_row.addWidget(self._pack_name_label, stretch=1)
@@ -103,7 +104,7 @@ class SchemaEditorDialog(
         self._readonly_label = QLabel("")
         self._readonly_label.setStyleSheet("color: #888;")
         bottom_row.addWidget(self._readonly_label, stretch=1)
-        self._save_btn = QPushButton("保存")
+        self._save_btn = QPushButton(t("btn.save"))
         self._save_btn.setEnabled(False)
         bottom_row.addWidget(self._save_btn)
         right_layout.addLayout(bottom_row)

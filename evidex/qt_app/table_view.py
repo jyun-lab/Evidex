@@ -21,6 +21,7 @@ from evidex.core.series_table import load_series_table
 from evidex.core.steps_table import load_steps_table
 
 from .popout import DetailPopoutWindow
+from evidex.core.i18n import t
 
 
 class TableMixin:
@@ -30,7 +31,7 @@ class TableMixin:
         try:
             self.record_table = load_record_table()
         except Exception as error:
-            QMessageBox.critical(self, "読み込みエラー", str(error))
+            QMessageBox.critical(self, t("qt.common.read_error"), str(error))
             return
 
         self.steps_by_run = {}
@@ -110,11 +111,11 @@ class TableMixin:
         shown = len(self.filtered_rows)
         query = self.search_input.text().strip()
         if query or self.nav_view is not None:
-            self.count_label.setText(f"{shown} / {total} 件")
+            self.count_label.setText(t("search.label.count", hits=shown, total=total))
         else:
-            self.count_label.setText(f"{total} 件")
+            self.count_label.setText(t("qt.table.total_count", total=total))
         self.statusBar().showMessage(
-            f"{self.record_table.records_csv}  |  {shown} / {total} 件"
+            t("qt.table.status_count", path=self.record_table.records_csv, shown=shown, total=total)
         )
         if self.filtered_rows:
             self.table.selectRow(0)
@@ -158,22 +159,22 @@ class TableMixin:
         self.show_selected_record()
 
         menu = QMenu(self)
-        menu.addAction("詳細を開く", self._open_selected_detail)
-        menu.addAction("記録を編集", self.edit_selected_record)
+        menu.addAction(t("main.menu.show_detail"), self._open_selected_detail)
+        menu.addAction(t("btn.edit_run"), self.edit_selected_record)
         if self.steps_enabled:
-            menu.addAction("工程を編集", self.edit_selected_steps)
+            menu.addAction(t("main.menu.edit_steps"), self.edit_selected_steps)
         menu.addSeparator()
         menu.addAction(
-            "raw_path を開く",
+            t("main.menu.open_raw"),
             lambda: self._open_selected_path("raw_path"),
         )
         menu.addAction(
-            "excel_path を開く",
+            t("main.menu.open_excel"),
             lambda: self._open_selected_path("excel_path"),
         )
-        menu.addAction("パスをコピー", self._copy_selected_paths)
+        menu.addAction(t("main.menu.copy_paths"), self._copy_selected_paths)
         menu.addSeparator()
-        menu.addAction("削除", self.delete_selected_record)
+        menu.addAction(t("btn.delete"), self.delete_selected_record)
         menu.exec(self.table.viewport().mapToGlobal(pos))
 
     def _open_selected_path(self, column):
@@ -183,8 +184,8 @@ class TableMixin:
         if not paths:
             QMessageBox.information(
                 self,
-                "情報",
-                f"{column} にファイルが登録されていません。",
+                t("msg.info"),
+                t("qt.table.no_file_for_column", column=column),
             )
             return
         resolved = resolve_record_file_path(
@@ -198,7 +199,7 @@ class TableMixin:
         else:
             QMessageBox.warning(
                 self,
-                "ファイルが見つかりません",
+                t("qt.common.file_not_found"),
                 str(resolved),
             )
 
@@ -209,11 +210,11 @@ class TableMixin:
         if paths:
             QApplication.clipboard().setText("\n".join(paths))
             self.statusBar().showMessage(
-                f"パスをコピーしました ({len(paths)} 件)",
+                t("tree.msg.paths_copied", n=len(paths)),
                 3000,
             )
         else:
-            QMessageBox.information(self, "情報", "raw_path が空です。")
+            QMessageBox.information(self, t("msg.info"), t("qt.common.raw_path_is_empty"))
 
     def _open_selected_detail(self):
         selected = self.table.selectionModel().selectedRows()

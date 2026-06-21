@@ -31,21 +31,22 @@ from evidex.core.series_table import (
     save_series_rows,
     series_manager_rows,
 )
+from evidex.core.i18n import t
 
 
 class SeriesManagerDialog(QDialog):
     series_selected = Signal(str)
 
     LABELS = {
-        "series_id": "シリーズID",
-        "experimenter": "実験者",
-        "period": "期間",
-        "objective": "目的",
-        "claim": "主張",
-        "established_knowns": "確立したこと",
-        "unresolved": "未解決",
-        "evidence_docs": "根拠文書",
-        "my_assessment": "自分の評価",
+        "series_id": t("series.col.sid"),
+        "experimenter": t("series.field.experimenter"),
+        "period": t("series.field.period"),
+        "objective": t("series.field.objective"),
+        "claim": t("series.field.claim"),
+        "established_knowns": t("series.field.established_knowns"),
+        "unresolved": t("series.field.unresolved"),
+        "evidence_docs": t("series.field.evidence_docs"),
+        "my_assessment": t("series.field.my_assessment"),
     }
     LONG_FIELDS = {
         "objective",
@@ -58,7 +59,7 @@ class SeriesManagerDialog(QDialog):
 
     def __init__(self, record_table, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("シリーズ管理")
+        self.setWindowTitle(t("series.title.manager"))
         self.resize(1180, 680)
         self.setMinimumSize(960, 600)
         self.record_table = record_table
@@ -74,9 +75,9 @@ class SeriesManagerDialog(QDialog):
         root.setSpacing(10)
 
         head = QHBoxLayout()
-        title = QLabel("シリーズ管理")
+        title = QLabel(t("series.title.manager"))
         title.setStyleSheet("font-size: 18px; font-weight: 700;")
-        note = QLabel("series_id ごとに実験記録をまとめ、研究の目的や主張を確認できます。")
+        note = QLabel(t("qt.common.group_experiment_records_by_series_id_to_review"))
         note.setStyleSheet("color: #667085;")
         head.addWidget(title)
         head.addWidget(note, stretch=1)
@@ -135,10 +136,10 @@ class SeriesManagerDialog(QDialog):
         detail_layout.setSpacing(8)
 
         detail_head = QHBoxLayout()
-        self.series_title = QLabel("シリーズを選択")
+        self.series_title = QLabel(t("qt.common.select_a_series"))
         self.series_title.setStyleSheet("font-size: 18px; font-weight: 700;")
-        self.series_edit_button = QPushButton("シリーズ情報を編集")
-        self.series_delete_button = QPushButton("シリーズを削除")
+        self.series_edit_button = QPushButton(t("btn.edit_series_info"))
+        self.series_delete_button = QPushButton(t("qt.common.delete_series"))
         self.series_delete_button.setStyleSheet("color: #B42318; border-color: #FDA29B;")
         self.series_edit_button.clicked.connect(
             lambda: self.edit_series(self.selected_sid() or "")
@@ -171,7 +172,7 @@ class SeriesManagerDialog(QDialog):
         self.story_area.setWidget(self.story_page)
         detail_layout.addWidget(self.story_area, stretch=1)
 
-        self.runs_label = QLabel("所属実験")
+        self.runs_label = QLabel(t("qt.common.linked_experiments"))
         self.runs_label.setStyleSheet("color: #667085; font-weight: 700;")
         detail_layout.addWidget(self.runs_label)
 
@@ -196,8 +197,8 @@ class SeriesManagerDialog(QDialog):
         self.splitter = splitter
 
         footer = QHBoxLayout()
-        new_button = QPushButton("新規シリーズ")
-        close_button = QPushButton("閉じる")
+        new_button = QPushButton(t("series.title.new_prompt"))
+        close_button = QPushButton(t("btn.close"))
         new_button.clicked.connect(self.new_series)
         close_button.clicked.connect(self.accept)
         footer.addWidget(new_button)
@@ -215,10 +216,10 @@ class SeriesManagerDialog(QDialog):
             self.series_rows,
             feature_enabled("grading"),
         )
-        columns = [("sid", "シリーズID"), ("n", "実験数"), ("period", "期間")]
+        columns = [("sid", t("series.col.sid")), ("n", t("series.col.n_runs")), ("period", t("series.field.period"))]
         if feature_enabled("grading"):
-            columns.append(("grades", "Grade推移"))
-        columns.append(("objective", "目的"))
+            columns.append(("grades", t("series.col.grade_seq")))
+        columns.append(("objective", t("series.field.objective")))
 
         self.table.blockSignals(True)
         self.table.clear()
@@ -260,7 +261,7 @@ class SeriesManagerDialog(QDialog):
             self.table.selectRow(target)
             self.render_selected_detail()
         else:
-            self.render_empty_detail("シリーズがまだありません。新規シリーズを作成するか、実験記録に series_id を設定してください。")
+            self.render_empty_detail(t("qt.common.there_are_no_series_yet_create_one_or"))
 
     def selected_sid(self):
         selected = self.table.selectionModel().selectedRows()
@@ -272,11 +273,11 @@ class SeriesManagerDialog(QDialog):
     def render_selected_detail(self):
         sid = self.selected_sid()
         if sid is None:
-            self.render_empty_detail("左の一覧からシリーズを選択してください。")
+            self.render_empty_detail(t("qt.common.select_a_series_from_the_list_on_the"))
             return
         row = next((item for item in self.rows_cache if item["sid"] == sid), None)
         if row is None:
-            self.render_empty_detail("シリーズ情報を表示できません。")
+            self.render_empty_detail(t("qt.common.series_information_could_not_be_displayed"))
             return
         self.render_detail(row)
 
@@ -289,10 +290,10 @@ class SeriesManagerDialog(QDialog):
 
     def render_empty_detail(self, message):
         self.clear_story()
-        self.series_title.setText("シリーズを選択")
+        self.series_title.setText(t("qt.common.select_a_series"))
         self.summary_label.setText(message)
         self.grades_label.setText("")
-        self.runs_label.setText("所属実験")
+        self.runs_label.setText(t("qt.common.linked_experiments"))
         self.series_edit_button.setEnabled(False)
         self.series_delete_button.setEnabled(False)
         self.runs_table.clear()
@@ -313,10 +314,10 @@ class SeriesManagerDialog(QDialog):
         self.series_title.setText(sid)
         self.series_edit_button.setEnabled(True)
         self.series_delete_button.setEnabled(True)
-        self.summary_label.setText(f"全{row['n']}実験  |  期間 {row['period']}")
+        self.summary_label.setText(t("series.label.summary", n=row["n"], period=row["period"]))
 
         if feature_enabled("grading"):
-            self.grades_label.setText(f"Grade推移: {row['grades']}")
+            self.grades_label.setText(t("qt.series.grade_sequence", grades=row["grades"]))
             self.grades_label.setVisible(True)
         else:
             self.grades_label.setText("")
@@ -337,13 +338,13 @@ class SeriesManagerDialog(QDialog):
                     self.detail_text_block(self.LABELS.get(key, key), value)
                 )
         else:
-            missing = QLabel("series.csvに未登録です。「シリーズ情報を編集」で作成できます。")
+            missing = QLabel(t("qt.common.not_registered_in_series_csv_use_edit_series"))
             missing.setWordWrap(True)
             missing.setStyleSheet("color: #667085;")
             self.story_layout.addWidget(missing)
         self.story_layout.addStretch()
 
-        self.runs_label.setText(f"所属実験 ({len(runs)}件)")
+        self.runs_label.setText(t("series.label.runs", n=len(runs)))
         self.populate_runs_table(runs)
 
     def detail_text_block(self, label, value):
@@ -371,10 +372,10 @@ class SeriesManagerDialog(QDialog):
 
     def populate_runs_table(self, runs):
         table = self.runs_table
-        columns = [("run_id", "run_id"), ("date", "日付"), ("title", "タイトル")]
+        columns = [("run_id", "run_id"), ("date", t("schema_editor.str41")), ("title", t("qt.common.title"))]
         if feature_enabled("grading"):
             columns.append(("grade", "Grade"))
-        columns.append(("result_summary", "結果要約"))
+        columns.append(("result_summary", t("pane.section.result_summary")))
         table.clear()
         table.setColumnCount(len(columns))
         table.setRowCount(len(runs))
@@ -413,15 +414,15 @@ class SeriesManagerDialog(QDialog):
     def new_series(self):
         series_id, ok = QInputDialog.getText(
             self,
-            "新規シリーズ",
-            "シリーズIDを入力してください。",
+            t("series.title.new_prompt"),
+            t("qt.common.enter_a_series_id"),
         )
         series_id = series_id.strip()
         if not ok or not series_id:
             return
         existing = {row["sid"].casefold() for row in self.rows_cache}
         if series_id.casefold() in existing:
-            QMessageBox.warning(self, "重複", f"シリーズ {series_id} は既に存在します。")
+            QMessageBox.warning(self, t("msg.duplicate"), t("series.msg.duplicate", sid=series_id))
             return
         self.edit_series(series_id)
 
@@ -458,7 +459,7 @@ class SeriesManagerDialog(QDialog):
             if not is_new and current is not None and original is not None:
                 current.clear()
                 current.update(original)
-            QMessageBox.critical(self, "保存エラー", str(error))
+            QMessageBox.critical(self, t("data.msg.save_error"), str(error))
             return
         self.changed = True
         self.refresh_table(series_id)
@@ -470,14 +471,13 @@ class SeriesManagerDialog(QDialog):
         ]
         if runs:
             message = (
-                f"シリーズ {series_id} には {len(runs)} 件の実験が紐づいています。\n"
-                "削除すると、それらの実験の series_id は空欄になります。続けますか?"
+                t("series.msg.confirm_delete_with_runs", sid=series_id, n=len(runs))
             )
         else:
-            message = f"シリーズ {series_id} を削除しますか?"
+            message = t("series.msg.confirm_delete", sid=series_id)
         answer = QMessageBox.question(
             self,
-            "シリーズを削除",
+            t("qt.common.delete_series"),
             message,
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No,
@@ -511,7 +511,7 @@ class SeriesManagerDialog(QDialog):
                 row.clear()
                 row.update(original)
             self.series_rows = original_series_rows
-            QMessageBox.critical(self, "削除エラー", str(error))
+            QMessageBox.critical(self, t("qt.common.delete_error"), str(error))
             return
         self.changed = True
         self.refresh_table()
@@ -520,7 +520,7 @@ class SeriesManagerDialog(QDialog):
 class SeriesEditDialog(QDialog):
     def __init__(self, row, fields, parent=None):
         super().__init__(parent)
-        self.setWindowTitle(f"シリーズ情報を編集: {row.get('series_id', '')}")
+        self.setWindowTitle(t("series.title.edit", sid=row.get("series_id", "")))
         self.resize(680, 560)
         self.row = row
         self.fields = list(fields)
@@ -539,7 +539,7 @@ class SeriesEditDialog(QDialog):
 
         sid = QLabel(row.get("series_id", ""))
         sid.setStyleSheet("font-weight: 700;")
-        form.addRow("シリーズID", sid)
+        form.addRow(t("series.col.sid"), sid)
         for field in self.fields:
             if field == "series_id":
                 continue
@@ -549,8 +549,8 @@ class SeriesEditDialog(QDialog):
 
         footer = QHBoxLayout()
         footer.addStretch()
-        cancel_button = QPushButton("キャンセル")
-        save_button = QPushButton("保存")
+        cancel_button = QPushButton(t("btn.cancel"))
+        save_button = QPushButton(t("btn.save"))
         save_button.setDefault(True)
         cancel_button.clicked.connect(self.reject)
         save_button.clicked.connect(self.accept)

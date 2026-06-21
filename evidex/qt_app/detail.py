@@ -29,6 +29,7 @@ from evidex.core.media import is_image_path
 from evidex.core.record_table import record_basic_items, record_file_entries
 
 from .waveform import RawDataPreviewWidget
+from evidex.core.i18n import t
 
 
 class DetailMixin:
@@ -59,23 +60,23 @@ class DetailMixin:
     def show_empty_detail(self):
         self.detail_tabs.clear()
         self.detail_tabs.addTab(
-            self.empty_tab("左の表から実験記録を選択してください。"),
-            "基本情報",
+            self.empty_tab(t("qt.common.select_an_experiment_record_from_the_table_on")),
+            t("pane.tab.basic"),
         )
         self.detail_tabs.addTab(
-            self.empty_tab("実験記録を選択すると、登録ファイルがここに表示されます。"),
-            "ファイル",
+            self.empty_tab(t("qt.common.registered_files_appear_here_after_you_select_an")),
+            t("menu.file"),
         )
         self.detail_tabs.addTab(
-            self.empty_tab("実験記録を選択すると、raw_path のCSVと簡易グラフがここに表示されます。"),
-            "CSV/グラフ",
+            self.empty_tab(t("qt.common.the_raw_path_csv_and_a_quick_graph")),
+            t("qt.common.csv_graph"),
         )
         self.current_row = None
         self.edit_button.setEnabled(False)
         self.steps_button.setEnabled(False)
         self.delete_button.setEnabled(False)
         self.popout_button.setEnabled(False)
-        self.detail_title.setText("記録を選択")
+        self.detail_title.setText(t("qt.common.select_a_record"))
 
     def empty_tab(self, message):
         theme = self._theme()
@@ -113,17 +114,17 @@ class DetailMixin:
 
     def render_detail(self, row):
         self.detail_tabs.clear()
-        self.detail_tabs.addTab(self.build_basic_tab(row), "基本情報")
+        self.detail_tabs.addTab(self.build_basic_tab(row), t("pane.tab.basic"))
         if self.steps_enabled:
-            self.detail_tabs.addTab(self.build_steps_tab(row), "工程")
-        self.detail_tabs.addTab(self.build_files_tab(row), "ファイル")
-        self.detail_tabs.addTab(self.build_raw_data_tab(row), "CSV/グラフ")
+            self.detail_tabs.addTab(self.build_steps_tab(row), t("pane.tab.steps"))
+        self.detail_tabs.addTab(self.build_files_tab(row), t("menu.file"))
+        self.detail_tabs.addTab(self.build_raw_data_tab(row), t("qt.common.csv_graph"))
         if self.series_enabled:
-            self.detail_tabs.addTab(self.build_series_tab(row), "系列")
+            self.detail_tabs.addTab(self.build_series_tab(row), t("pane.tab.series"))
 
     def build_basic_tab(self, row):
         area, layout = self.make_scroll_page()
-        title = row.get("run_id", "") or "IDなし"
+        title = row.get("run_id", "") or t("qt.common.no_id")
         heading = QLabel(title)
         heading.setStyleSheet(f"font-size: 18px; font-weight: 700; color: {self._theme()['text']};")
         layout.addWidget(heading)
@@ -157,7 +158,7 @@ class DetailMixin:
         run_id = row.get("run_id", "")
         steps = self.steps_by_run.get(run_id, [])
         if not steps:
-            empty = QLabel("この記録には工程が登録されていません。")
+            empty = QLabel(t("pane.msg.no_steps"))
             empty.setStyleSheet(self._muted_ss())
             layout.addWidget(empty)
             layout.addStretch()
@@ -207,7 +208,7 @@ class DetailMixin:
         area, layout = self.make_scroll_page()
         sid = (row.get("series_id", "") or "").strip()
         if not sid:
-            empty = QLabel("この記録にはシリーズが割り当てられていません。")
+            empty = QLabel(t("pane.msg.no_series"))
             empty.setStyleSheet(self._muted_ss())
             layout.addWidget(empty)
             layout.addStretch()
@@ -218,13 +219,13 @@ class DetailMixin:
         runs.sort(key=lambda x: (x.get("date", ""), x.get("run_id", "")))
 
         # 概要ヘッダ
-        heading = QLabel(f"シリーズ: {sid}")
+        heading = QLabel(t("pane.label.series_title", sid=sid))
         heading.setStyleSheet(f"font-size: 15px; font-weight: 700; color: {self._theme()['text']};")
         layout.addWidget(heading)
 
         dates = [x.get("date", "") for x in runs if x.get("date", "")]
         period = f"{min(dates)} 〜 {max(dates)}" if dates else "—"
-        summary = QLabel(f"{len(runs)} 件  |  {period}")
+        summary = QLabel(t("series.label.summary", n=len(runs), period=period))
         summary.setStyleSheet(self._muted_ss())
         layout.addWidget(summary)
 
@@ -232,7 +233,7 @@ class DetailMixin:
         if feature_enabled("grading"):
             grade_row = QHBoxLayout()
             grade_row.setSpacing(4)
-            grade_label = QLabel("Grade推移:")
+            grade_label = QLabel(t("series.label.grade_seq"))
             grade_label.setStyleSheet(self._muted_ss())
             grade_row.addWidget(grade_label)
             for i, r_ in enumerate(runs):
@@ -255,11 +256,11 @@ class DetailMixin:
             None,
         )
         known_map_fields = [
-            ("objective", "目的"),
-            ("claim", "主張"),
-            ("established_knowns", "確認済み事実"),
-            ("unresolved", "未解決"),
-            ("my_assessment", "所見"),
+            ("objective", t("series.field.objective")),
+            ("claim", t("series.field.claim")),
+            ("established_knowns", t("series.field.established_knowns")),
+            ("unresolved", t("series.field.unresolved")),
+            ("my_assessment", t("series.field.my_assessment")),
         ]
         if srow:
             for key, label in known_map_fields:
@@ -277,13 +278,13 @@ class DetailMixin:
                     )
                     layout.addWidget(vl)
         else:
-            note = QLabel("このシリーズは series.csv に未登録です。シリーズ管理から登録できます。")
+            note = QLabel(t("qt.common.this_series_is_not_registered_in_series_csv"))
             note.setStyleSheet(self._muted_ss())
             note.setWordWrap(True)
             layout.addWidget(note)
 
         # 差分タイムライン
-        tl_label = QLabel("タイムライン")
+        tl_label = QLabel(t("pane.label.timeline"))
         tl_label.setStyleSheet(f"color: {self._theme()['text_muted']}; font-weight: 600; margin-top: 10px;")
         layout.addWidget(tl_label)
 
@@ -341,7 +342,7 @@ class DetailMixin:
             if prev_params is None:
                 init_parts = [f"{k}={v}" for k, v in params.items() if v]
                 if init_parts:
-                    il = QLabel("初期条件: " + "、".join(init_parts))
+                    il = QLabel(t("pane.label.initial_condition") + "、".join(init_parts))
                     il.setWordWrap(True)
                     il.setStyleSheet(f"color: {self._theme()['text_muted']}; padding-left: 16px;")
                     box_layout.addWidget(il)
@@ -363,7 +364,7 @@ class DetailMixin:
                         dl.setStyleSheet("color: #0E6E8C; padding-left: 16px;")
                         box_layout.addWidget(dl)
                 else:
-                    nl = QLabel("（変更なし）")
+                    nl = QLabel(t("pane.msg.no_change"))
                     nl.setStyleSheet(
                         f"color: {self._theme()['text_muted']}; font-size: 11px; padding-left: 16px;"
                     )
@@ -426,7 +427,7 @@ class DetailMixin:
         area, layout = self.make_scroll_page()
         groups = record_file_entries(row, self.record_table.records_csv)
         if not groups:
-            empty = QLabel("この記録にはファイルが登録されていません。")
+            empty = QLabel(t("qt.common.no_files_are_registered_for_this_record"))
             empty.setStyleSheet(self._muted_ss())
             layout.addWidget(empty)
             layout.addStretch()
@@ -439,7 +440,7 @@ class DetailMixin:
                 if entry.exists and is_image_path(str(entry.path)):
                     image_entries.append(entry)
         if image_entries:
-            img_heading = QLabel(f"画像 ({len(image_entries)})")
+            img_heading = QLabel(t("qt.detail.images_count", n=len(image_entries)))
             img_heading.setStyleSheet(f"color: {self._theme()['text_muted']}; font-weight: 700;")
             layout.addWidget(img_heading)
             gallery = QWidget()
@@ -515,7 +516,7 @@ class DetailMixin:
                     QSizePolicy.Policy.Preferred,
                 )
                 name.setStyleSheet("font-weight: 700;")
-                status = QLabel("存在します" if entry.exists else "見つかりません")
+                status = QLabel(t("qt.common.available") if entry.exists else t("qt.common.missing"))
                 status.setSizePolicy(
                     QSizePolicy.Policy.Fixed,
                     QSizePolicy.Policy.Preferred,
@@ -525,7 +526,7 @@ class DetailMixin:
                     if entry.exists
                     else "color: #C2410C; font-weight: 700;"
                 )
-                open_button = QPushButton("開く")
+                open_button = QPushButton(t("qt.common.open"))
                 open_button.setSizePolicy(
                     QSizePolicy.Policy.Fixed,
                     QSizePolicy.Policy.Fixed,
@@ -561,14 +562,14 @@ class DetailMixin:
         if not entry.exists:
             QMessageBox.warning(
                 self,
-                "ファイルが見つかりません",
-                f"ファイルが見つかりません。\n{entry.resolved_path}",
+                t("qt.common.file_not_found"),
+                t("pane.msg.file_not_found", path=entry.resolved_path),
             )
             return
         url = QUrl.fromLocalFile(str(entry.resolved_path))
         if not QDesktopServices.openUrl(url):
             QMessageBox.warning(
                 self,
-                "ファイルを開けません",
-                f"ファイルを開けませんでした。\n{entry.resolved_path}",
+                t("qt.common.cannot_open_file"),
+                t("qt.common.file_open_failed", path=entry.resolved_path),
             )

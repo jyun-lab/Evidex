@@ -110,7 +110,7 @@ class NavigationMixin:
 
     def _preset_context_menu(self, pos, preset_name, btn):
         menu = QMenu(self)
-        delete_action = menu.addAction("削除")
+        delete_action = menu.addAction(t("btn.delete"))
         chosen = menu.exec(btn.mapToGlobal(pos))
         if chosen == delete_action:
             prefs = self._load_prefs()
@@ -169,7 +169,7 @@ class NavigationMixin:
         self._clear_nav_layout()
 
         # 「すべて」
-        self._add_nav_item("すべて", None, len(self.record_table.rows))
+        self._add_nav_item(t("nav.section.all"), None, len(self.record_table.rows))
 
         for facet in FACETS:
             items = self._facet_items(facet)
@@ -194,7 +194,7 @@ class NavigationMixin:
                           if row_matches(r, f_p, self.steps_by_run))
                 p_items.append((p_name, cnt))
             self._add_nav_separator()
-            self._add_nav_section_header("保存した検索", "preset")
+            self._add_nav_section_header(t("nav.section.presets"), "preset")
             if self._nav_open.get("preset", False):
                 for p_name, cnt in p_items:
                     self._add_nav_item(p_name, ("preset", p_name), cnt)

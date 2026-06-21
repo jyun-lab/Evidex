@@ -46,6 +46,7 @@ from .record_ops import RecordOpsMixin
 from .table_view import TableMixin
 from .theming import ThemeMixin
 from .widgets import ElidingButton, ScrollSafeComboBox
+from evidex.core.i18n import t
 
 
 class EvidexQtWindow(
@@ -61,7 +62,7 @@ class EvidexQtWindow(
         super().__init__()
         from evidex.core import settings as app_settings
         self.dark = app_settings.get("theme") == "dark"
-        self.setWindowTitle("Evidex Qt プレビュー")
+        self.setWindowTitle(t("qt.common.evidex_qt_preview"))
         self.resize(1100, 700)
         self.nav_view = None
         self._nav_open = {facet["field"]: False for facet in FACETS}
@@ -72,7 +73,7 @@ class EvidexQtWindow(
         self.steps_enabled = feature_enabled("steps", bool(STEP_FORM))
         self.series_enabled = feature_enabled("series", False)
 
-        self.statusBar().showMessage("Qt版プレビューを起動しました。")
+        self.statusBar().showMessage(t("qt.common.evidex_qt_preview_started"))
 
         root = QWidget()
         layout = QVBoxLayout(root)
@@ -121,17 +122,17 @@ class EvidexQtWindow(
         header.setContentsMargins(0, 0, 0, 0)
         header.setSpacing(10)
         header_widget.setLayout(header)
-        self.title_label = QLabel("Evidex Qt プレビュー")
+        self.title_label = QLabel(t("qt.common.evidex_qt_preview"))
         self.title_label.setStyleSheet("font-size: 20px; font-weight: 700;")
         self.note_label = QLabel(
-            "Qt版の試作画面です。Tkinter版も引き続き使えます。"
+            t("qt.common.this_is_the_qt_preview_the_tkinter_version")
         )
         self.note_label.setStyleSheet("color: #667085;")
-        new_button = QPushButton("新しい実験記録を追加")
+        new_button = QPushButton(t("qt.common.add_new_experiment_record"))
         new_button.clicked.connect(self.add_new_record)
-        self.series_manager_button = QPushButton("シリーズ管理")
+        self.series_manager_button = QPushButton(t("series.title.manager"))
         self.series_manager_button.clicked.connect(self.open_series_manager)
-        reload_button = QPushButton("再読み込み")
+        reload_button = QPushButton(t("menu.file.reload"))
         reload_button.clicked.connect(self.reload_records)
         header.addWidget(self.title_label)
         header.addWidget(self.note_label, stretch=1)
@@ -151,22 +152,22 @@ class EvidexQtWindow(
         search_widget.setLayout(search_bar)
         self.nav_toggle_button = QPushButton("☰")
         self.nav_toggle_button.setFixedSize(32, 28)
-        self.nav_toggle_button.setToolTip("ナビゲーションの表示を切り替え")
+        self.nav_toggle_button.setToolTip(t("qt.common.toggle_navigation"))
         self.nav_toggle_button.setCursor(Qt.CursorShape.PointingHandCursor)
         self.nav_toggle_button.clicked.connect(self.toggle_nav)
         self.nav_toggle_button.setVisible(bool(FACETS))
-        search_label = QLabel("検索")
+        search_label = QLabel(t("btn.search"))
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText(
-            "ID、日付、タイトル、要約、ファイルパスなどから検索"
+            t("qt.common.search_by_id_date_title_summary_file_path")
         )
         self.search_input.textChanged.connect(self.apply_search)
-        self.adv_toggle_button = QPushButton("詳細フィルタ ▸")
+        self.adv_toggle_button = QPushButton(t("btn.adv_filter", n="", arrow="▸"))
         self.adv_toggle_button.setStyleSheet(
             "QPushButton { border: none; color: #2563EB; font-weight: 600; }"
         )
         self.adv_toggle_button.clicked.connect(self.toggle_advanced_filters)
-        clear_button = QPushButton("クリア")
+        clear_button = QPushButton(t("btn.clear"))
         clear_button.clicked.connect(self.clear_all_filters)
         self.count_label = QLabel("")
         self.count_label.setStyleSheet("color: #667085;")
@@ -177,11 +178,11 @@ class EvidexQtWindow(
         search_bar.addWidget(clear_button)
         self.preset_box = ScrollSafeComboBox()
         self.preset_box.setFixedWidth(140)
-        self.preset_box.setPlaceholderText("プリセット")
+        self.preset_box.setPlaceholderText(t("qt.common.preset"))
         self.preset_box.currentTextChanged.connect(self._on_preset_selected)
         search_bar.addWidget(self.preset_box)
 
-        self.preset_save_btn = QPushButton("保存")
+        self.preset_save_btn = QPushButton(t("btn.save"))
         self.preset_save_btn.setFixedWidth(40)
         self.preset_save_btn.clicked.connect(self.save_preset)
         search_bar.addWidget(self.preset_save_btn)
@@ -220,7 +221,7 @@ class EvidexQtWindow(
             g0 = QGridLayout(); g0.setHorizontalSpacing(8); g0.setVerticalSpacing(0)
             c = 0
             if "viscosity_range" in af:
-                lbl = _flbl("粘度:")
+                lbl = _flbl(t("main.label.viscosity"))
                 g0.addWidget(lbl, 0, c); c += 1
                 self.filter_vmin = QLineEdit(); self.filter_vmin.setPlaceholderText("min")
                 self.filter_vmin.textChanged.connect(self.apply_search)
@@ -230,7 +231,7 @@ class EvidexQtWindow(
                 self.filter_vmax.textChanged.connect(self.apply_search)
                 g0.addWidget(self.filter_vmax, 0, c); g0.setColumnStretch(c, 1); c += 1
             if "date_range" in af:
-                lbl = _flbl("日付:")
+                lbl = _flbl(t("pane.field.date"))
                 g0.addWidget(lbl, 0, c); c += 1
                 self.filter_dfrom = QLineEdit(); self.filter_dfrom.setPlaceholderText("from")
                 self.filter_dfrom.textChanged.connect(self.apply_search)
@@ -240,7 +241,7 @@ class EvidexQtWindow(
                 self.filter_dto.textChanged.connect(self.apply_search)
                 g0.addWidget(self.filter_dto, 0, c); g0.setColumnStretch(c, 1); c += 1
             if "series" in af:
-                lbl = _flbl("シリーズ:")
+                lbl = _flbl(t("pane.field.series"))
                 g0.addWidget(lbl, 0, c); c += 1
                 self.filter_series = ScrollSafeComboBox()
                 self.filter_series.setEditable(True)
@@ -254,10 +255,10 @@ class EvidexQtWindow(
         self.filter_understanding = None
         self.filter_action = None
         row1_items = [
-            ("chip", "チップ:"),
-            ("experimenter", "実験者:"),
-            ("understanding", "理解度:"),
-            ("action", "操作:"),
+            ("chip", t("qt.common.chip")),
+            ("experimenter", t("qt.common.experimenter")),
+            ("understanding", t("qt.common.understanding")),
+            ("action", t("qt.common.action")),
         ]
         row1_in_af = [(k, l) for k, l in row1_items if k in af]
         if row1_in_af:
@@ -292,11 +293,11 @@ class EvidexQtWindow(
         self.filter_no_steps = None
         if "flags" in af:
             flags_row = QHBoxLayout(); flags_row.setSpacing(14)
-            self.filter_has_raw = QCheckBox("raw_path あり")
+            self.filter_has_raw = QCheckBox(t("main.label.has_raw"))
             self.filter_has_raw.stateChanged.connect(self.apply_search)
             flags_row.addWidget(self.filter_has_raw)
             if feature_enabled("steps"):
-                self.filter_no_steps = QCheckBox("工程なし")
+                self.filter_no_steps = QCheckBox(t("main.label.no_steps"))
                 self.filter_no_steps.stateChanged.connect(self.apply_search)
                 flags_row.addWidget(self.filter_no_steps)
             flags_row.addStretch()
@@ -321,18 +322,18 @@ class EvidexQtWindow(
                     self.grade_checks[g] = cb
                     g3.addWidget(cb, 0, c); c += 1
             if "unread" in af:
-                self.filter_unread = QCheckBox("未読のみ")
+                self.filter_unread = QCheckBox(t("main.label.unread_only"))
                 self.filter_unread.stateChanged.connect(self.apply_search)
                 g3.addWidget(self.filter_unread, 0, c); c += 1
             if "status" in af:
-                lbl = _flbl("ステータス:")
+                lbl = _flbl(t("main.label.status_colon"))
                 g3.addWidget(lbl, 0, c); c += 1
                 self.filter_status_combo = ScrollSafeComboBox()
                 self.filter_status_combo.setEditable(True)
                 self.filter_status_combo.currentTextChanged.connect(self.apply_search)
                 g3.addWidget(self.filter_status_combo, 0, c); g3.setColumnStretch(c, 1); c += 1
             if "liquid" in af:
-                lbl = _flbl("液体:")
+                lbl = _flbl(t("main.label.liquid_colon"))
                 g3.addWidget(lbl, 0, c); c += 1
                 self.filter_liquid = ScrollSafeComboBox()
                 self.filter_liquid.setEditable(True)
@@ -417,9 +418,9 @@ class EvidexQtWindow(
         action_layout = QHBoxLayout(self.detail_action_bar)
         action_layout.setContentsMargins(0, 0, 0, 0)
         action_layout.setSpacing(8)
-        self.detail_title = QLabel("記録を選択")
+        self.detail_title = QLabel(t("qt.common.select_a_record"))
         self.detail_title.setStyleSheet("font-weight: 700; color: #344054;")
-        self.popout_button = ElidingButton("別ウィンドウで開く")
+        self.popout_button = ElidingButton(t("btn.open_in_window"))
         self.popout_button.setEnabled(False)
         self.popout_button.setCursor(Qt.CursorShape.PointingHandCursor)
         self.popout_button.setStyleSheet("""
@@ -431,13 +432,13 @@ class EvidexQtWindow(
             QPushButton:disabled { color: #98A2B3; }
         """)
         self.popout_button.clicked.connect(self._open_selected_detail)
-        self.edit_button = ElidingButton("実験記録を編集")
+        self.edit_button = ElidingButton(t("qt.common.edit_experiment_record"))
         self.edit_button.setEnabled(False)
         self.edit_button.clicked.connect(self.edit_selected_record)
-        self.steps_button = ElidingButton("工程を編集")
+        self.steps_button = ElidingButton(t("main.menu.edit_steps"))
         self.steps_button.setEnabled(False)
         self.steps_button.clicked.connect(self.edit_selected_steps)
-        self.delete_button = ElidingButton("実験記録を削除")
+        self.delete_button = ElidingButton(t("qt.common.delete_experiment_record"))
         self.delete_button.setEnabled(False)
         self.delete_button.clicked.connect(self.delete_selected_record)
         self.delete_button.setStyleSheet(
@@ -490,32 +491,32 @@ class EvidexQtWindow(
 
     def _build_menubar(self):
         menubar = self.menuBar()
-        file_menu = menubar.addMenu("ファイル(&F)")
-        file_menu.addAction("開く...", self._menu_open_file)
-        file_menu.addAction("再読み込み", self.reload_records)
+        file_menu = menubar.addMenu(t("qt.common.file"))
+        file_menu.addAction(t("menu.file.open"), self._menu_open_file)
+        file_menu.addAction(t("menu.file.reload"), self.reload_records)
         file_menu.addSeparator()
-        file_menu.addAction("設定...", self.open_settings)
-        file_menu.addAction("パック管理...", self.open_schema_editor)
+        file_menu.addAction(t("menu.file.settings"), self.open_settings)
+        file_menu.addAction(t("menu.file.pack_manager"), self.open_schema_editor)
         file_menu.addSeparator()
-        file_menu.addAction("終了", self.close)
+        file_menu.addAction(t("menu.file.exit"), self.close)
 
-        view_menu = menubar.addMenu("表示(&V)")
-        self.nav_action = view_menu.addAction("ナビゲーション")
+        view_menu = menubar.addMenu(t("qt.common.view"))
+        self.nav_action = view_menu.addAction(t("qt.common.navigation"))
         self.nav_action.setCheckable(True)
         self.nav_action.setChecked(bool(FACETS))
         self.nav_action.triggered.connect(self.toggle_nav)
         if not FACETS:
             self.nav_action.setVisible(False)
 
-        self.dark_action = view_menu.addAction("ダークモード")
+        self.dark_action = view_menu.addAction(t("menu.view.dark_mode"))
         self.dark_action.setCheckable(True)
         self.dark_action.setChecked(self.dark)
         self.dark_action.triggered.connect(self._menu_toggle_theme)
 
         if self.series_enabled:
-            series_menu = menubar.addMenu("シリーズ(&S)")
+            series_menu = menubar.addMenu(t("qt.common.series"))
             series_menu.addAction(
-                "シリーズ管理...",
+                t("menu.series.manage"),
                 self.open_series_manager,
             )
 
@@ -550,7 +551,7 @@ class EvidexQtWindow(
         from evidex.packs import get_pack_names
 
         dialog = QDialog(self)
-        dialog.setWindowTitle("設定")
+        dialog.setWindowTitle(t("dialog.settings.title"))
         dialog.setMinimumWidth(360)
         dialog.setModal(True)
 
@@ -568,28 +569,28 @@ class EvidexQtWindow(
         current_pack = app_settings.get("active_pack")
         if current_pack in pack_names:
             pack_combo.setCurrentText(current_pack)
-        form.addRow("アクティブなパック:", pack_combo)
+        form.addRow(t("dialog.settings.pack"), pack_combo)
 
         theme_combo = QComboBox()
         theme_combo.addItems(["system", "light", "dark"])
         current_theme = app_settings.get("theme", "system")
         theme_combo.setCurrentText(current_theme)
-        form.addRow("テーマ:", theme_combo)
+        form.addRow(t("dialog.settings.theme"), theme_combo)
 
-        lang_map = {"ja": "日本語", "en": "English"}
+        lang_map = {"ja": t("schema_editor.str8"), "en": "English"}
         reverse_lang_map = {value: key for key, value in lang_map.items()}
         lang_combo = QComboBox()
         lang_combo.addItems(list(lang_map.values()))
         current_lang = app_settings.get("language", "en")
         lang_combo.setCurrentText(lang_map.get(current_lang, "English"))
-        form.addRow("言語 / Language:", lang_combo)
+        form.addRow(t("dialog.settings.language"), lang_combo)
 
         main_layout.addLayout(form)
 
         button_layout = QHBoxLayout()
         button_layout.addStretch()
-        cancel_button = QPushButton("キャンセル")
-        save_button = QPushButton("保存")
+        cancel_button = QPushButton(t("btn.cancel"))
+        save_button = QPushButton(t("btn.save"))
         save_button.setDefault(True)
         button_layout.addWidget(cancel_button)
         button_layout.addWidget(save_button)
@@ -619,9 +620,8 @@ class EvidexQtWindow(
             if old_pack != new_pack or old_lang != new_lang:
                 QMessageBox.information(
                     dialog,
-                    "設定",
-                    "アクティブパックや言語の変更は、"
-                    "次回アプリ起動時に反映されます。",
+                    t("dialog.settings.title"),
+                    t("dialog.settings.msg_reboot"),
                 )
             dialog.accept()
 
@@ -638,7 +638,7 @@ class EvidexQtWindow(
     def _menu_open_file(self):
         path, _ = QFileDialog.getOpenFileName(
             self,
-            "CSVファイルを開く",
+            t("qt.common.open_csv_file"),
             "",
             "CSV Files (*.csv);;All Files (*)",
         )

@@ -6,6 +6,7 @@ from PySide6.QtWidgets import QInputDialog, QMessageBox
 
 from evidex.core.fields import ACTION_CHOICES
 from evidex.core.filtering import fnum, row_matches
+from evidex.core.i18n import t
 
 
 class FilterMixin:
@@ -212,7 +213,7 @@ class FilterMixin:
         n = self._adv_filter_count()
         arrow = "▾" if self.adv_visible else "▸"
         suffix = f" ({n})" if n else ""
-        self.adv_toggle_button.setText(f"詳細フィルタ{suffix} {arrow}")
+        self.adv_toggle_button.setText(t("btn.adv_filter", n=suffix, arrow=arrow))
         # 状態バー
         parts = []
         if f["grades"]:
@@ -220,23 +221,23 @@ class FilterMixin:
         if f["vmin"] is not None or f["vmax"] is not None:
             lo = f["vmin"] if f["vmin"] is not None else "..."
             hi = f["vmax"] if f["vmax"] is not None else "..."
-            parts.append(f"粘度: {lo}〜{hi}")
+            parts.append(t("qt.filter.viscosity_range", lo=lo, hi=hi))
         if f["dfrom"] or f["dto"]:
-            parts.append(f"日付: {f['dfrom'] or '...'} 〜 {f['dto'] or '...'}")
-        for key, label in (("series", "シリーズ"), ("chip", "チップ"),
-                           ("status", "ステータス"), ("who", "実験者"),
-                           ("understanding", "理解度"), ("action", "操作"),
-                           ("liquid", "液体")):
+            parts.append(t("qt.filter.date_range", start=f["dfrom"] or "...", end=f["dto"] or "..."))
+        for key, label in (("series", t("menu.series")), ("chip", t("pane.field.chip")),
+                           ("status", t("nav.section.status")), ("who", t("series.field.experimenter")),
+                           ("understanding", t("pane.field.understanding")), ("action", t("steps.col.action")),
+                           ("liquid", t("steps.col.liquid"))):
             if f.get(key):
                 parts.append(f"{label}: {f[key]}")
         if f["has_raw"]:
-            parts.append("raw_pathあり")
+            parts.append(t("search.filter.has_raw"))
         if f["no_steps"]:
-            parts.append("工程なし")
+            parts.append(t("main.label.no_steps"))
         if f["unread"]:
-            parts.append("未読のみ")
+            parts.append(t("main.label.unread_only"))
         if parts:
-            self.filter_status_bar.setText("フィルタ: " + " | ".join(parts))
+            self.filter_status_bar.setText(t("qt.common.filters") + " | ".join(parts))
             self.filter_status_bar.setVisible(True)
         else:
             self.filter_status_bar.setVisible(False)
@@ -248,7 +249,7 @@ class FilterMixin:
         n = self._adv_filter_count()
         arrow = "▾" if self.adv_visible else "▸"
         suffix = f" ({n})" if n else ""
-        self.adv_toggle_button.setText(f"詳細フィルタ{suffix} {arrow}")
+        self.adv_toggle_button.setText(t("btn.adv_filter", n=suffix, arrow=arrow))
 
     def clear_all_filters(self):
         self.search_input.blockSignals(True)
@@ -288,7 +289,7 @@ class FilterMixin:
 
     def save_preset(self):
         name, ok = QInputDialog.getText(
-            self, "プリセット保存", "プリセット名を入力:")
+            self, t("qt.common.save_preset"), t("prefs.msg.preset_name"))
         if not ok or not name.strip():
             return
         name = name.strip()
@@ -327,5 +328,5 @@ class FilterMixin:
                 encoding="utf-8")
             return True
         except Exception as e:
-            QMessageBox.warning(self, "保存エラー", str(e))
+            QMessageBox.warning(self, t("data.msg.save_error"), str(e))
             return False
