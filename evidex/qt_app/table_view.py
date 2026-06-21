@@ -31,7 +31,7 @@ class TableMixin:
         try:
             self.record_table = load_record_table()
         except Exception as error:
-            QMessageBox.critical(self, t("qt.common.read_error"), str(error))
+            QMessageBox.critical(self, t("qt.msg.read_error"), str(error))
             return
 
         self.steps_by_run = {}
@@ -199,7 +199,7 @@ class TableMixin:
         else:
             QMessageBox.warning(
                 self,
-                t("qt.common.file_not_found"),
+                t("qt.file.not_found_title"),
                 str(resolved),
             )
 
@@ -214,7 +214,7 @@ class TableMixin:
                 3000,
             )
         else:
-            QMessageBox.information(self, t("msg.info"), t("qt.common.raw_path_is_empty"))
+            QMessageBox.information(self, t("msg.info"), t("qt.table.raw_path_empty"))
 
     def _open_selected_detail(self):
         selected = self.table.selectionModel().selectedRows()

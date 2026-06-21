@@ -32,7 +32,7 @@ class FilePathEditor(QWidget):
 
         self.list_widget = QTableWidget()
         self.list_widget.setColumnCount(3)
-        self.list_widget.setHorizontalHeaderLabels([t("qt.common.file_name"), t("qt.common.path"), t("pane.field.status")])
+        self.list_widget.setHorizontalHeaderLabels([t("qt.files.name_column"), t("qt.files.path_column"), t("pane.field.status")])
         self.list_widget.verticalHeader().setVisible(False)
         self.list_widget.setSelectionBehavior(
             QAbstractItemView.SelectionBehavior.SelectRows
@@ -49,9 +49,9 @@ class FilePathEditor(QWidget):
         root.addWidget(self.list_widget)
 
         buttons = QHBoxLayout()
-        add_button = QPushButton(t("qt.common.add_files"))
-        remove_button = QPushButton(t("qt.common.remove_selected_items"))
-        self.open_selected_button = QPushButton(t("qt.common.open_selected_file"))
+        add_button = QPushButton(t("qt.files.add"))
+        remove_button = QPushButton(t("qt.files.remove_selected"))
+        self.open_selected_button = QPushButton(t("qt.files.open_selected"))
         add_button.clicked.connect(self.add_files)
         remove_button.clicked.connect(self.remove_selected)
         self.open_selected_button.clicked.connect(self.open_selected_file)
@@ -79,7 +79,7 @@ class FilePathEditor(QWidget):
             exists = resolved.exists()
             name_item = QTableWidgetItem(self.display_name(path))
             path_item = QTableWidgetItem(path)
-            status_item = QTableWidgetItem(t("qt.common.available") if exists else t("qt.common.missing"))
+            status_item = QTableWidgetItem(t("qt.file.exists") if exists else t("qt.file.missing"))
             name_item.setToolTip(path)
             path_item.setToolTip(str(resolved))
             status_item.setToolTip(str(resolved))
@@ -104,7 +104,7 @@ class FilePathEditor(QWidget):
         self.list_widget.setFixedHeight(header_height + row_height * rows + 8)
 
     def add_files(self):
-        selected, _ = QFileDialog.getOpenFileNames(self, t("qt.common.add_files"))
+        selected, _ = QFileDialog.getOpenFileNames(self, t("qt.files.add"))
         if not selected:
             return
         normalized = [self.normalize_path(path) for path in selected]
@@ -154,7 +154,7 @@ class FilePathEditor(QWidget):
         if not resolved.exists():
             QMessageBox.warning(
                 self,
-                t("qt.common.file_not_found"),
+                t("qt.file.not_found_title"),
                 t("pane.msg.file_not_found", path=resolved),
             )
             self.update_open_button()
@@ -163,8 +163,8 @@ class FilePathEditor(QWidget):
         if not QDesktopServices.openUrl(url):
             QMessageBox.warning(
                 self,
-                t("qt.common.cannot_open_file"),
-                t("qt.common.file_open_failed", path=resolved),
+                t("qt.file.open_failed_title"),
+                t("qt.file.open_failed", path=resolved),
             )
 
     def value(self):

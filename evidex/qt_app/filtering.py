@@ -237,7 +237,7 @@ class FilterMixin:
         if f["unread"]:
             parts.append(t("main.label.unread_only"))
         if parts:
-            self.filter_status_bar.setText(t("qt.common.filters") + " | ".join(parts))
+            self.filter_status_bar.setText(t("qt.filter.status_prefix") + " | ".join(parts))
             self.filter_status_bar.setVisible(True)
         else:
             self.filter_status_bar.setVisible(False)
@@ -289,7 +289,7 @@ class FilterMixin:
 
     def save_preset(self):
         name, ok = QInputDialog.getText(
-            self, t("qt.common.save_preset"), t("prefs.msg.preset_name"))
+            self, t("qt.filter.save_preset_title"), t("prefs.msg.preset_name"))
         if not ok or not name.strip():
             return
         name = name.strip()

@@ -60,23 +60,23 @@ class DetailMixin:
     def show_empty_detail(self):
         self.detail_tabs.clear()
         self.detail_tabs.addTab(
-            self.empty_tab(t("qt.common.select_an_experiment_record_from_the_table_on")),
+            self.empty_tab(t("qt.detail.select_record_prompt")),
             t("pane.tab.basic"),
         )
         self.detail_tabs.addTab(
-            self.empty_tab(t("qt.common.registered_files_appear_here_after_you_select_an")),
+            self.empty_tab(t("qt.detail.files_prompt")),
             t("menu.file"),
         )
         self.detail_tabs.addTab(
-            self.empty_tab(t("qt.common.the_raw_path_csv_and_a_quick_graph")),
-            t("qt.common.csv_graph"),
+            self.empty_tab(t("qt.detail.raw_data_prompt")),
+            t("qt.detail.csv_graph"),
         )
         self.current_row = None
         self.edit_button.setEnabled(False)
         self.steps_button.setEnabled(False)
         self.delete_button.setEnabled(False)
         self.popout_button.setEnabled(False)
-        self.detail_title.setText(t("qt.common.select_a_record"))
+        self.detail_title.setText(t("qt.detail.select_record"))
 
     def empty_tab(self, message):
         theme = self._theme()
@@ -118,7 +118,7 @@ class DetailMixin:
         if self.steps_enabled:
             self.detail_tabs.addTab(self.build_steps_tab(row), t("pane.tab.steps"))
         self.detail_tabs.addTab(self.build_files_tab(row), t("menu.file"))
-        self.detail_tabs.addTab(self.build_raw_data_tab(row), t("qt.common.csv_graph"))
+        self.detail_tabs.addTab(self.build_raw_data_tab(row), t("qt.detail.csv_graph"))
         if self.series_enabled:
             self.detail_tabs.addTab(self.build_series_tab(row), t("pane.tab.series"))
 
@@ -278,7 +278,7 @@ class DetailMixin:
                     )
                     layout.addWidget(vl)
         else:
-            note = QLabel(t("qt.common.this_series_is_not_registered_in_series_csv"))
+            note = QLabel(t("qt.detail.series_unregistered"))
             note.setStyleSheet(self._muted_ss())
             note.setWordWrap(True)
             layout.addWidget(note)
@@ -427,7 +427,7 @@ class DetailMixin:
         area, layout = self.make_scroll_page()
         groups = record_file_entries(row, self.record_table.records_csv)
         if not groups:
-            empty = QLabel(t("qt.common.no_files_are_registered_for_this_record"))
+            empty = QLabel(t("qt.detail.no_files"))
             empty.setStyleSheet(self._muted_ss())
             layout.addWidget(empty)
             layout.addStretch()
@@ -516,7 +516,7 @@ class DetailMixin:
                     QSizePolicy.Policy.Preferred,
                 )
                 name.setStyleSheet("font-weight: 700;")
-                status = QLabel(t("qt.common.available") if entry.exists else t("qt.common.missing"))
+                status = QLabel(t("qt.file.exists") if entry.exists else t("qt.file.missing"))
                 status.setSizePolicy(
                     QSizePolicy.Policy.Fixed,
                     QSizePolicy.Policy.Preferred,
@@ -526,7 +526,7 @@ class DetailMixin:
                     if entry.exists
                     else "color: #C2410C; font-weight: 700;"
                 )
-                open_button = QPushButton(t("qt.common.open"))
+                open_button = QPushButton(t("btn.open"))
                 open_button.setSizePolicy(
                     QSizePolicy.Policy.Fixed,
                     QSizePolicy.Policy.Fixed,
@@ -562,7 +562,7 @@ class DetailMixin:
         if not entry.exists:
             QMessageBox.warning(
                 self,
-                t("qt.common.file_not_found"),
+                t("qt.file.not_found_title"),
                 t("pane.msg.file_not_found", path=entry.resolved_path),
             )
             return
@@ -570,6 +570,6 @@ class DetailMixin:
         if not QDesktopServices.openUrl(url):
             QMessageBox.warning(
                 self,
-                t("qt.common.cannot_open_file"),
-                t("qt.common.file_open_failed", path=entry.resolved_path),
+                t("qt.file.open_failed_title"),
+                t("qt.file.open_failed", path=entry.resolved_path),
             )

@@ -77,7 +77,7 @@ class SeriesManagerDialog(QDialog):
         head = QHBoxLayout()
         title = QLabel(t("series.title.manager"))
         title.setStyleSheet("font-size: 18px; font-weight: 700;")
-        note = QLabel(t("qt.common.group_experiment_records_by_series_id_to_review"))
+        note = QLabel(t("qt.series.description"))
         note.setStyleSheet("color: #667085;")
         head.addWidget(title)
         head.addWidget(note, stretch=1)
@@ -136,10 +136,10 @@ class SeriesManagerDialog(QDialog):
         detail_layout.setSpacing(8)
 
         detail_head = QHBoxLayout()
-        self.series_title = QLabel(t("qt.common.select_a_series"))
+        self.series_title = QLabel(t("qt.series.select"))
         self.series_title.setStyleSheet("font-size: 18px; font-weight: 700;")
         self.series_edit_button = QPushButton(t("btn.edit_series_info"))
-        self.series_delete_button = QPushButton(t("qt.common.delete_series"))
+        self.series_delete_button = QPushButton(t("qt.series.delete"))
         self.series_delete_button.setStyleSheet("color: #B42318; border-color: #FDA29B;")
         self.series_edit_button.clicked.connect(
             lambda: self.edit_series(self.selected_sid() or "")
@@ -172,7 +172,7 @@ class SeriesManagerDialog(QDialog):
         self.story_area.setWidget(self.story_page)
         detail_layout.addWidget(self.story_area, stretch=1)
 
-        self.runs_label = QLabel(t("qt.common.linked_experiments"))
+        self.runs_label = QLabel(t("qt.series.linked_runs"))
         self.runs_label.setStyleSheet("color: #667085; font-weight: 700;")
         detail_layout.addWidget(self.runs_label)
 
@@ -261,7 +261,7 @@ class SeriesManagerDialog(QDialog):
             self.table.selectRow(target)
             self.render_selected_detail()
         else:
-            self.render_empty_detail(t("qt.common.there_are_no_series_yet_create_one_or"))
+            self.render_empty_detail(t("qt.series.empty"))
 
     def selected_sid(self):
         selected = self.table.selectionModel().selectedRows()
@@ -273,11 +273,11 @@ class SeriesManagerDialog(QDialog):
     def render_selected_detail(self):
         sid = self.selected_sid()
         if sid is None:
-            self.render_empty_detail(t("qt.common.select_a_series_from_the_list_on_the"))
+            self.render_empty_detail(t("qt.series.select_prompt"))
             return
         row = next((item for item in self.rows_cache if item["sid"] == sid), None)
         if row is None:
-            self.render_empty_detail(t("qt.common.series_information_could_not_be_displayed"))
+            self.render_empty_detail(t("qt.series.unavailable"))
             return
         self.render_detail(row)
 
@@ -290,10 +290,10 @@ class SeriesManagerDialog(QDialog):
 
     def render_empty_detail(self, message):
         self.clear_story()
-        self.series_title.setText(t("qt.common.select_a_series"))
+        self.series_title.setText(t("qt.series.select"))
         self.summary_label.setText(message)
         self.grades_label.setText("")
-        self.runs_label.setText(t("qt.common.linked_experiments"))
+        self.runs_label.setText(t("qt.series.linked_runs"))
         self.series_edit_button.setEnabled(False)
         self.series_delete_button.setEnabled(False)
         self.runs_table.clear()
@@ -338,7 +338,7 @@ class SeriesManagerDialog(QDialog):
                     self.detail_text_block(self.LABELS.get(key, key), value)
                 )
         else:
-            missing = QLabel(t("qt.common.not_registered_in_series_csv_use_edit_series"))
+            missing = QLabel(t("qt.series.unregistered"))
             missing.setWordWrap(True)
             missing.setStyleSheet("color: #667085;")
             self.story_layout.addWidget(missing)
@@ -372,7 +372,7 @@ class SeriesManagerDialog(QDialog):
 
     def populate_runs_table(self, runs):
         table = self.runs_table
-        columns = [("run_id", "run_id"), ("date", t("schema_editor.str41")), ("title", t("qt.common.title"))]
+        columns = [("run_id", "run_id"), ("date", t("schema_editor.str41")), ("title", t("qt.series.run_title_column"))]
         if feature_enabled("grading"):
             columns.append(("grade", "Grade"))
         columns.append(("result_summary", t("pane.section.result_summary")))
@@ -415,7 +415,7 @@ class SeriesManagerDialog(QDialog):
         series_id, ok = QInputDialog.getText(
             self,
             t("series.title.new_prompt"),
-            t("qt.common.enter_a_series_id"),
+            t("qt.series.enter_id"),
         )
         series_id = series_id.strip()
         if not ok or not series_id:
@@ -477,7 +477,7 @@ class SeriesManagerDialog(QDialog):
             message = t("series.msg.confirm_delete", sid=series_id)
         answer = QMessageBox.question(
             self,
-            t("qt.common.delete_series"),
+            t("qt.series.delete"),
             message,
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No,
@@ -511,7 +511,7 @@ class SeriesManagerDialog(QDialog):
                 row.clear()
                 row.update(original)
             self.series_rows = original_series_rows
-            QMessageBox.critical(self, t("qt.common.delete_error"), str(error))
+            QMessageBox.critical(self, t("qt.msg.delete_error"), str(error))
             return
         self.changed = True
         self.refresh_table()

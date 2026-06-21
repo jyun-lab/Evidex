@@ -51,7 +51,7 @@ class StepsEditorDialog(QDialog):
         root.addWidget(title)
 
         hint = QLabel(
-            t("qt.common.edit_the_steps_linked_to_this_experiment_record")
+            t("qt.steps.editor_hint")
         )
         hint.setWordWrap(True)
         hint.setStyleSheet("color: #667085;")
@@ -59,7 +59,7 @@ class StepsEditorDialog(QDialog):
 
         if not self.form_fields:
             empty = QLabel(
-                t("qt.common.this_pack_does_not_define_any_step_fields")
+                t("qt.steps.no_fields")
             )
             empty.setWordWrap(True)
             empty.setStyleSheet(
@@ -109,9 +109,9 @@ class StepsEditorDialog(QDialog):
         root.addWidget(self.table, stretch=1)
 
         button_row = QHBoxLayout()
-        self.add_button = QPushButton(t("qt.common.add_step"))
-        self.edit_button = QPushButton(t("qt.common.edit_selected_step"))
-        self.delete_button = QPushButton(t("qt.common.delete_selected_step"))
+        self.add_button = QPushButton(t("qt.steps.add"))
+        self.edit_button = QPushButton(t("qt.steps.edit_selected"))
+        self.delete_button = QPushButton(t("qt.steps.delete_selected"))
         self.up_button = QPushButton(t("btn.up"))
         self.down_button = QPushButton(t("btn.down"))
         for button, slot in [
@@ -218,7 +218,7 @@ class StepsEditorDialog(QDialog):
     def delete_step(self):
         index = self.selected_index()
         if index is None:
-            QMessageBox.information(self, t("qt.common.delete_step"), t("steps.msg.select_delete"))
+            QMessageBox.information(self, t("qt.steps.delete"), t("steps.msg.select_delete"))
             return
         del self.steps[index]
         self.refresh_table(index)
