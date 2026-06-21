@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - GitHub Actions release workflow: tag `v*` triggers test, PyInstaller build (tkinter + Qt), and GitHub Release with artifacts
 - `build.py` flags: `--qt` for Qt exe, `--version` to append version to exe name
 - PySide6 LGPL license notice bundled with Qt exe builds
+- Demo data (oscilloscope pack, signals, images) bundled in exe and auto-extracted on first run
+- Qt exe now calls `extract_bundled_assets()` on startup (same as tkinter)
+
+### Fixed
+
+- `pyproject.toml`: removed `License :: OSI Approved :: MIT License` classifier that conflicted with PEP 639 `license = "MIT"` field (broke `pip install` on latest setuptools)
 
 ### Changed
 
