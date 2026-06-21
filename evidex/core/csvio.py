@@ -77,6 +77,49 @@ def extract_bundled_assets(base_dir=None):
             copied.append(name)
         except OSError:
             pass
+
+    # Extract demo data on first run
+    demo_src = src_dir / "demo"
+    if demo_src.is_dir():
+        # Demo CSV files (runs.csv, steps.csv, series.csv)
+        for csv_name in ("runs.csv", "steps.csv", "series.csv"):
+            src = demo_src / csv_name
+            dst = base_dir / csv_name
+            if dst.exists() or not src.exists():
+                continue
+            try:
+                shutil.copy2(src, dst)
+                copied.append(csv_name)
+            except OSError:
+                pass
+
+        # Demo directories (signals/, images/)
+        for dir_name in ("signals", "images"):
+            src = demo_src / dir_name
+            dst = base_dir / dir_name
+            if dst.exists() or not src.is_dir():
+                continue
+            try:
+                shutil.copytree(src, dst)
+                copied.append(f"{dir_name}/")
+            except OSError:
+                pass
+
+        # Demo packs (merge into packs/ without overwriting existing)
+        demo_packs = demo_src / "packs"
+        if demo_packs.is_dir():
+            dst_packs = base_dir / "packs"
+            dst_packs.mkdir(exist_ok=True)
+            for pack_dir in demo_packs.iterdir():
+                if pack_dir.is_dir():
+                    dst_pack = dst_packs / pack_dir.name
+                    if not dst_pack.exists():
+                        try:
+                            shutil.copytree(pack_dir, dst_pack)
+                            copied.append(f"packs/{pack_dir.name}/")
+                        except OSError:
+                            pass
+
     return copied
 
 def parse_device_csv(path):

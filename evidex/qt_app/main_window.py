@@ -648,6 +648,12 @@ class EvidexQtWindow(
             self.reload_records()
 
 def run(argv=None):
+    from evidex.core.csvio import extract_bundled_assets, ensure_initial_csv_files
+    from evidex.core import config
+
+    extract_bundled_assets()
+    ensure_initial_csv_files(config.RECORDS_CSV.parent)
+
     app = QApplication(list(argv) if argv is not None else sys.argv)
     window = EvidexQtWindow()
     window.show()

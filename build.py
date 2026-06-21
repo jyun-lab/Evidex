@@ -152,6 +152,14 @@ cmd += [
     "--add-data",
     f"{os.path.join(HERE, 'evidex', 'locales')}{SEP}evidex{os.sep}locales",
 ]
+
+# Bundle demo data so first-time users can explore immediately
+DEMO_DIR = os.path.join(HERE, "examples", "demo")
+if os.path.isdir(DEMO_DIR):
+    cmd += ["--add-data", f"{DEMO_DIR}{SEP}demo"]
+else:
+    print("[WARN] examples/demo not found; demo data will not be bundled.")
+
 cmd.append(entry_point)
 
 print("Running:", " ".join(cmd))
