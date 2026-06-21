@@ -10,6 +10,7 @@ from pathlib import Path
 import threading
 from ..core import config
 from ..core.fields import RUN_FIELDS, STEP_FIELDS, SERIES_FIELDS, COLS, HEAD, LONG_FIELDS, JP_LABEL, CHOICES, GCOL, STEP_FORM, ACTION_CHOICES, MEDIA_SEEDS, HIDDEN_EDIT_FIELDS
+from ..core.fields import get_label
 from ..core.backup import prune_backups
 from ..core.attachments import split_paths
 from ..core.csvio import ensure_initial_csv_files, parse_device_csv
@@ -18,7 +19,7 @@ from ..core.icons import icon_for_action, icon_for_liquid, HELP_TEXT
 from ..core.media import is_image_path
 from ..gui_runtime import THEMED, MPL, tb, bstyle, resolve_tk_font
 from ..components import Tooltip, DatePicker, ScrollFrame
-from ..core.i18n import t
+from ..core.i18n import current_locale, t
 
 class PaneMixin:
     def toggle_pane(self):
@@ -311,10 +312,10 @@ class PaneMixin:
                                      f"{primary_value}",
                           font=("", 10, "bold")).pack(side="left")
                 sub = []
-                for field, label in self.STEP_FORM[1:]:
+                for field, _label in self.STEP_FORM[1:]:
                     value = (s.get(field, "") or "").strip()
                     if value and field != "notes":
-                        sub.append(f"{label}: {value}")
+                        sub.append(f"{get_label(field)}: {value}")
                 if sub:
                     ttk.Label(card, text=" · ".join(sub), font=("", 9),
                               foreground="#888").pack(anchor="w")
@@ -533,7 +534,8 @@ class PaneMixin:
                       foreground="#888").pack(side="left")
             params = self._run_params(x)
             if prev is None:
-                init = "、".join(f"{k}={v}" for k, v in params.items() if v)
+                sep = "、" if current_locale() == "ja" else ", "
+                init = sep.join(f"{k}={v}" for k, v in params.items() if v)
                 if init:
                     ttk.Label(box, text=t("pane.label.initial_condition") + init,
                               wraplength=wrap, justify="left",

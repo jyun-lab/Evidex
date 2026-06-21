@@ -10,6 +10,7 @@ from pathlib import Path
 import threading
 from ..core import config
 from ..core.fields import RUN_FIELDS, STEP_FIELDS, SERIES_FIELDS, COLS, HEAD, LONG_FIELDS, JP_LABEL, CHOICES, GCOL, STEP_FORM, ACTION_CHOICES, MEDIA_SEEDS, HIDDEN_EDIT_FIELDS
+from ..core.fields import get_label
 from ..core.backup import prune_backups
 from ..core.csvio import ensure_initial_csv_files, parse_device_csv
 from ..core.filtering import norm, fnum, row_matches
@@ -74,7 +75,7 @@ class SearchMixin:
             arrow = ""
             if getattr(self, "_sort_col", None) == c:
                 arrow = " ▼" if getattr(self, "_sort_rev", False) else " ▲"
-            self.tree.heading(c, text=HEAD[c] + arrow)
+            self.tree.heading(c, text=get_label(c) + arrow)
         # フィルタ状態バー(A-2): 条件があるときだけ表示
         txt = self._active_filter_text(self.filters())
         if txt:

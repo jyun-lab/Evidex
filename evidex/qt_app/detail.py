@@ -22,6 +22,7 @@ from evidex.core.fields import (
     LONG_FIELDS,
     STEP_FORM,
     feature_enabled,
+    get_label,
 )
 from evidex.core.filtering import fnum
 from evidex.core.icons import icon_for_action
@@ -29,7 +30,7 @@ from evidex.core.media import is_image_path
 from evidex.core.record_table import record_basic_items, record_file_entries
 
 from .waveform import RawDataPreviewWidget
-from evidex.core.i18n import t
+from evidex.core.i18n import current_locale, t
 
 
 class DetailMixin:
@@ -181,10 +182,10 @@ class DetailMixin:
             card_layout.addWidget(header)
 
             sub_parts = []
-            for field, label in STEP_FORM[1:]:
+            for field, _label in STEP_FORM[1:]:
                 value = (step.get(field, "") or "").strip()
                 if value and field != "notes":
-                    sub_parts.append(f"{label}: {value}")
+                    sub_parts.append(f"{get_label(field)}: {value}")
             if sub_parts:
                 sub = QLabel(" · ".join(sub_parts))
                 sub.setWordWrap(True)
@@ -342,7 +343,8 @@ class DetailMixin:
             if prev_params is None:
                 init_parts = [f"{k}={v}" for k, v in params.items() if v]
                 if init_parts:
-                    il = QLabel(t("pane.label.initial_condition") + "、".join(init_parts))
+                    sep = "、" if current_locale() == "ja" else ", "
+                    il = QLabel(t("pane.label.initial_condition") + sep.join(init_parts))
                     il.setWordWrap(True)
                     il.setStyleSheet(f"color: {self._theme()['text_muted']}; padding-left: 16px;")
                     box_layout.addWidget(il)

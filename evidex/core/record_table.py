@@ -40,7 +40,7 @@ def default_record_columns():
     return [
         RecordColumn(
             key=key,
-            label=fields.HEAD.get(key, key),
+            label=fields.get_label(key),
             width=int(width or 120),
         )
         for key, width in fields.COLS

@@ -10,6 +10,7 @@ from evidex.core.icons import icon_for_action, HELP_TEXT
 from evidex.core.table_style import configure_treeview_rows, stripe_tag
 from evidex.gui_runtime import bstyle
 from evidex.core.i18n import t
+from evidex.core.fields import get_label
 
 def validate_step(self, out):
     """問題なければNone、あればエラーメッセージを返す"""
@@ -64,9 +65,10 @@ def step_form(self, parent, data, on_ok):
     frm = ttk.Frame(win, padding=12)
     frm.pack(fill="both", expand=True)
     widgets = {}
-    for i, (k, label) in enumerate(self.STEP_FORM):
-        ttk.Label(frm, text=label).grid(row=i, column=0, sticky="ne",
-                                        padx=(0, 10), pady=2)
+    for i, (k, _label) in enumerate(self.STEP_FORM):
+        ttk.Label(frm, text=get_label(k)).grid(
+            row=i, column=0, sticky="ne", padx=(0, 10), pady=2
+        )
         if k == "action":
             w = ttk.Combobox(frm, width=34, values=self.ACTION_CHOICES)
             w.set(data.get(k, ""))
@@ -132,9 +134,9 @@ def open_steps_editor(self, run_id):
     win.geometry("760x470")
     win.minsize(640, 400)
     cols = [("step_no", t("steps.col.no"), 50)]
-    for field, label in self.STEP_FORM:
+    for field, _label in self.STEP_FORM:
         width = 180 if field == "notes" else 110
-        cols.append((field, label, width))
+        cols.append((field, get_label(field), width))
     tree = ttk.Treeview(win, columns=[c for c, _, _ in cols],
                         show="headings", height=10)
     configure_treeview_rows(tree, getattr(self, "dark", False))

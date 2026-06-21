@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from evidex.core.fields import ACTION_CHOICES, STEP_FORM
+from evidex.core.fields import ACTION_CHOICES, STEP_FORM, get_label
 from evidex.core.steps_table import (
     load_steps_table,
     save_steps_table,
@@ -140,7 +140,13 @@ class StepsEditorDialog(QDialog):
         self.refresh_table()
 
     def refresh_table(self, selected_row=None):
-        columns = [("step_no", "No"), *self.form_fields]
+        columns = [
+            ("step_no", "No"),
+            *[
+                (field, get_label(field))
+                for field, _label in self.form_fields
+            ],
+        ]
         self.table.blockSignals(True)
         self.table.clear()
         self.table.setColumnCount(len(columns))
@@ -277,10 +283,10 @@ class StepEditDialog(QDialog):
         scroll.setWidget(page)
         root.addWidget(scroll, stretch=1)
 
-        for field, label in STEP_FORM:
+        for field, _label in STEP_FORM:
             widget = self.create_widget(field, step.get(field, ""))
             self.widgets[field] = widget
-            form.addRow(label, widget)
+            form.addRow(get_label(field), widget)
 
         footer = QHBoxLayout()
         footer.addStretch()

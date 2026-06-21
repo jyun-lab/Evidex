@@ -6,8 +6,9 @@ import shutil
 from evidex.core import config
 from evidex.core.backup import prune_backups
 from evidex.core.csvio import ensure_initial_csv_files, load_with_header
-from evidex.core.fields import STEP_FIELDS, STEP_FORM
+from evidex.core.fields import STEP_FIELDS, STEP_FORM, get_label
 from evidex.core.filtering import fnum
+from evidex.core.i18n import t
 
 
 def steps_csv_for_records(records_csv=None):
@@ -62,21 +63,21 @@ def save_steps_table(records_csv, steps_by_run, fields, previous_mtime=None):
 def validate_step_update(updated):
     primary = STEP_FORM[0][0] if STEP_FORM else None
     if primary and not updated.get(primary, "").strip():
-        raise ValueError("最初の項目は必須です。")
+        raise ValueError(t("steps.validation.primary_required"))
 
     numeric_fields = [
-        ("viscosity_mPas", "粘度"),
-        ("drop_volume_uL", "滴下量"),
-        ("duration_min", "時間"),
-        ("data_start_row", "開始行"),
-        ("data_end_row", "終了行"),
+        ("viscosity_mPas", get_label("viscosity_mPas")),
+        ("drop_volume_uL", get_label("drop_volume_uL")),
+        ("duration_min", get_label("duration_min")),
+        ("data_start_row", get_label("data_start_row")),
+        ("data_end_row", get_label("data_end_row")),
     ]
     for field, label in numeric_fields:
         if field not in STEP_FIELDS:
             continue
         value = updated.get(field, "").strip()
         if value and fnum(value) is None:
-            raise ValueError(f"{label}は数値で入力してください。")
+            raise ValueError(t("steps.validation.must_be_number", label=label))
 
     start = updated.get("data_start_row", "").strip()
     end = updated.get("data_end_row", "").strip()
@@ -84,11 +85,11 @@ def validate_step_update(updated):
         start_num = fnum(start) if start else None
         end_num = fnum(end) if end else None
         if start_num is not None and end_num is not None and start_num > end_num:
-            raise ValueError("開始行は終了行以下にしてください。")
+            raise ValueError(t("steps.validation.start_must_le_end"))
         if (start_num is not None and start_num < 2) or (
             end_num is not None and end_num < 2
         ):
-            raise ValueError("CSVのデータ行は2行目以降を指定してください。")
+            raise ValueError(t("steps.validation.data_rows_min_2"))
 
     return True
 
