@@ -1,0 +1,68 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yml
+
+  build:
+    needs: test
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        include:
+          - variant: tk
+            deps: ".[tk] pyinstaller"
+            build_args: ""
+          - variant: qt
+            deps: ".[qt] pyinstaller"
+            build_args: "--qt"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Extract version from tag
+        id: version
+        shell: bash
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ${{ matrix.deps }}
+
+      - name: Build executable
+        run: python build.py ${{ matrix.build_args }} --version ${{ steps.version.outputs.version }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Evidex-${{ matrix.variant }}-${{ steps.version.outputs.version }}
+          path: dist/*.exe
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: artifacts/*.exe
