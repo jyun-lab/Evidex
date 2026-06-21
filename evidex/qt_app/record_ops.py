@@ -42,8 +42,8 @@ class RecordOpsMixin:
         if self.current_row is None or self.record_table is None:
             QMessageBox.information(
                 self,
-                t("qt.common.edit_experiment_record"),
-                t("qt.common.select_an_experiment_record_to_edit"),
+                t("qt.run.edit"),
+                t("qt.run.select_edit"),
             )
             return
         dialog = RecordEditDialog(
@@ -95,7 +95,7 @@ class RecordOpsMixin:
             self.record_table.fields,
             self,
             base_dir=self.record_table.records_csv.parent,
-            title=t("qt.common.add_new_experiment_record"),
+            title=t("qt.run.add"),
             series_choices=self._known_series(),
         )
         if dialog.exec() != QDialog.DialogCode.Accepted:
@@ -130,14 +130,14 @@ class RecordOpsMixin:
         if self.current_row is None or self.record_table is None:
             QMessageBox.information(
                 self,
-                t("qt.common.delete_experiment_record"),
-                t("qt.common.select_an_experiment_record_to_delete"),
+                t("qt.run.delete"),
+                t("qt.run.select_delete"),
             )
             return
         run_id = self.current_row.get("run_id", "") or t("pane.label.no_id")
         answer = QMessageBox.question(
             self,
-            t("qt.common.delete_experiment_record"),
+            t("qt.run.delete"),
             t("qt.run.confirm_delete", run_id=run_id),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No,
@@ -157,7 +157,7 @@ class RecordOpsMixin:
         except Exception as error:
             if row not in self.record_table.rows:
                 self.record_table.rows.append(row)
-            QMessageBox.critical(self, t("qt.common.delete_error"), str(error))
+            QMessageBox.critical(self, t("qt.msg.delete_error"), str(error))
             return
 
         self.reload_records()
@@ -170,7 +170,7 @@ class RecordOpsMixin:
             QMessageBox.information(
                 self,
                 t("main.menu.edit_steps"),
-                t("qt.common.select_an_experiment_record_whose_steps_you_want"),
+                t("qt.run.select_steps"),
             )
             return
         run_id = self.current_row.get("run_id", "").strip()
@@ -178,7 +178,7 @@ class RecordOpsMixin:
             QMessageBox.information(
                 self,
                 t("main.menu.edit_steps"),
-                t("qt.common.steps_cannot_be_edited_for_a_record_without"),
+                t("qt.run.steps_need_run_id"),
             )
             return
         dialog = StepsEditorDialog(
@@ -203,4 +203,4 @@ class RecordOpsMixin:
             self.reload_records()
             if getattr(dialog, "target_run_id", ""):
                 self.select_run_id(dialog.target_run_id)
-            self.statusBar().showMessage(t("qt.common.series_manager_changes_have_been_applied"), 5000)
+            self.statusBar().showMessage(t("qt.series.changes_applied"), 5000)

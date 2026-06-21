@@ -62,7 +62,7 @@ class EvidexQtWindow(
         super().__init__()
         from evidex.core import settings as app_settings
         self.dark = app_settings.get("theme") == "dark"
-        self.setWindowTitle(t("qt.common.evidex_qt_preview"))
+        self.setWindowTitle(t("qt.main.title"))
         self.resize(1100, 700)
         self.nav_view = None
         self._nav_open = {facet["field"]: False for facet in FACETS}
@@ -73,7 +73,7 @@ class EvidexQtWindow(
         self.steps_enabled = feature_enabled("steps", bool(STEP_FORM))
         self.series_enabled = feature_enabled("series", False)
 
-        self.statusBar().showMessage(t("qt.common.evidex_qt_preview_started"))
+        self.statusBar().showMessage(t("qt.main.started"))
 
         root = QWidget()
         layout = QVBoxLayout(root)
@@ -122,13 +122,13 @@ class EvidexQtWindow(
         header.setContentsMargins(0, 0, 0, 0)
         header.setSpacing(10)
         header_widget.setLayout(header)
-        self.title_label = QLabel(t("qt.common.evidex_qt_preview"))
+        self.title_label = QLabel(t("qt.main.title"))
         self.title_label.setStyleSheet("font-size: 20px; font-weight: 700;")
         self.note_label = QLabel(
-            t("qt.common.this_is_the_qt_preview_the_tkinter_version")
+            t("qt.main.preview_note")
         )
         self.note_label.setStyleSheet("color: #667085;")
-        new_button = QPushButton(t("qt.common.add_new_experiment_record"))
+        new_button = QPushButton(t("qt.run.add"))
         new_button.clicked.connect(self.add_new_record)
         self.series_manager_button = QPushButton(t("series.title.manager"))
         self.series_manager_button.clicked.connect(self.open_series_manager)
@@ -152,14 +152,14 @@ class EvidexQtWindow(
         search_widget.setLayout(search_bar)
         self.nav_toggle_button = QPushButton("☰")
         self.nav_toggle_button.setFixedSize(32, 28)
-        self.nav_toggle_button.setToolTip(t("qt.common.toggle_navigation"))
+        self.nav_toggle_button.setToolTip(t("qt.main.toggle_navigation"))
         self.nav_toggle_button.setCursor(Qt.CursorShape.PointingHandCursor)
         self.nav_toggle_button.clicked.connect(self.toggle_nav)
         self.nav_toggle_button.setVisible(bool(FACETS))
         search_label = QLabel(t("btn.search"))
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText(
-            t("qt.common.search_by_id_date_title_summary_file_path")
+            t("qt.main.search_placeholder")
         )
         self.search_input.textChanged.connect(self.apply_search)
         self.adv_toggle_button = QPushButton(t("btn.adv_filter", n="", arrow="▸"))
@@ -178,7 +178,7 @@ class EvidexQtWindow(
         search_bar.addWidget(clear_button)
         self.preset_box = ScrollSafeComboBox()
         self.preset_box.setFixedWidth(140)
-        self.preset_box.setPlaceholderText(t("qt.common.preset"))
+        self.preset_box.setPlaceholderText(t("qt.filter.preset_placeholder"))
         self.preset_box.currentTextChanged.connect(self._on_preset_selected)
         search_bar.addWidget(self.preset_box)
 
@@ -255,10 +255,10 @@ class EvidexQtWindow(
         self.filter_understanding = None
         self.filter_action = None
         row1_items = [
-            ("chip", t("qt.common.chip")),
-            ("experimenter", t("qt.common.experimenter")),
-            ("understanding", t("qt.common.understanding")),
-            ("action", t("qt.common.action")),
+            ("chip", t("qt.filter.chip_label")),
+            ("experimenter", t("qt.filter.experimenter_label")),
+            ("understanding", t("qt.filter.understanding_label")),
+            ("action", t("qt.filter.action_label")),
         ]
         row1_in_af = [(k, l) for k, l in row1_items if k in af]
         if row1_in_af:
@@ -418,7 +418,7 @@ class EvidexQtWindow(
         action_layout = QHBoxLayout(self.detail_action_bar)
         action_layout.setContentsMargins(0, 0, 0, 0)
         action_layout.setSpacing(8)
-        self.detail_title = QLabel(t("qt.common.select_a_record"))
+        self.detail_title = QLabel(t("qt.detail.select_record"))
         self.detail_title.setStyleSheet("font-weight: 700; color: #344054;")
         self.popout_button = ElidingButton(t("btn.open_in_window"))
         self.popout_button.setEnabled(False)
@@ -432,13 +432,13 @@ class EvidexQtWindow(
             QPushButton:disabled { color: #98A2B3; }
         """)
         self.popout_button.clicked.connect(self._open_selected_detail)
-        self.edit_button = ElidingButton(t("qt.common.edit_experiment_record"))
+        self.edit_button = ElidingButton(t("qt.run.edit"))
         self.edit_button.setEnabled(False)
         self.edit_button.clicked.connect(self.edit_selected_record)
         self.steps_button = ElidingButton(t("main.menu.edit_steps"))
         self.steps_button.setEnabled(False)
         self.steps_button.clicked.connect(self.edit_selected_steps)
-        self.delete_button = ElidingButton(t("qt.common.delete_experiment_record"))
+        self.delete_button = ElidingButton(t("qt.run.delete"))
         self.delete_button.setEnabled(False)
         self.delete_button.clicked.connect(self.delete_selected_record)
         self.delete_button.setStyleSheet(
@@ -491,7 +491,7 @@ class EvidexQtWindow(
 
     def _build_menubar(self):
         menubar = self.menuBar()
-        file_menu = menubar.addMenu(t("qt.common.file"))
+        file_menu = menubar.addMenu(t("qt.menu.file"))
         file_menu.addAction(t("menu.file.open"), self._menu_open_file)
         file_menu.addAction(t("menu.file.reload"), self.reload_records)
         file_menu.addSeparator()
@@ -500,8 +500,8 @@ class EvidexQtWindow(
         file_menu.addSeparator()
         file_menu.addAction(t("menu.file.exit"), self.close)
 
-        view_menu = menubar.addMenu(t("qt.common.view"))
-        self.nav_action = view_menu.addAction(t("qt.common.navigation"))
+        view_menu = menubar.addMenu(t("qt.menu.view"))
+        self.nav_action = view_menu.addAction(t("qt.menu.navigation"))
         self.nav_action.setCheckable(True)
         self.nav_action.setChecked(bool(FACETS))
         self.nav_action.triggered.connect(self.toggle_nav)
@@ -514,7 +514,7 @@ class EvidexQtWindow(
         self.dark_action.triggered.connect(self._menu_toggle_theme)
 
         if self.series_enabled:
-            series_menu = menubar.addMenu(t("qt.common.series"))
+            series_menu = menubar.addMenu(t("qt.menu.series"))
             series_menu.addAction(
                 t("menu.series.manage"),
                 self.open_series_manager,
@@ -638,7 +638,7 @@ class EvidexQtWindow(
     def _menu_open_file(self):
         path, _ = QFileDialog.getOpenFileName(
             self,
-            t("qt.common.open_csv_file"),
+            t("qt.main.open_csv"),
             "",
             "CSV Files (*.csv);;All Files (*)",
         )

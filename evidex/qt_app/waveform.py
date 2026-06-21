@@ -118,7 +118,7 @@ class RawDataPreviewWidget(QWidget):
 
         if not self.files:
             message = QLabel(
-                t("qt.common.no_csv_is_registered_in_raw_path_edit")
+                t("qt.waveform.no_csv")
             )
             message.setWordWrap(True)
             message.setStyleSheet("color: #667085;")
@@ -132,7 +132,7 @@ class RawDataPreviewWidget(QWidget):
         for path in self.files:
             self.file_combo.addItem(path.name, str(path))
         self.file_combo.currentIndexChanged.connect(self.load_selected_file)
-        self.open_button = QPushButton(t("qt.common.open"))
+        self.open_button = QPushButton(t("btn.open"))
         self.open_button.clicked.connect(self.open_selected_file)
         top.addWidget(self.file_combo, stretch=1)
         top.addWidget(self.open_button)
@@ -297,7 +297,7 @@ class RawDataPreviewWidget(QWidget):
         self.preview_table.setColumnCount(0)
         self.plot.set_signal(None)
         if path is None:
-            self.status_label.setText(t("qt.common.no_csv_is_selected"))
+            self.status_label.setText(t("qt.waveform.no_selection"))
             self.open_button.setEnabled(False)
             return
         if not path.exists():
@@ -318,9 +318,9 @@ class RawDataPreviewWidget(QWidget):
 
         if not MPL_AVAILABLE:
             self.plot.set_message(
-                t("qt.common.matplotlib_is_required_for_high_quality_graph_display")
+                t("qt.waveform.mpl_required")
             )
-            graph_message = t("qt.common.graph_matplotlib_is_not_installed")
+            graph_message = t("qt.waveform.mpl_missing_status")
         else:
             try:
                 signal = active_pack().parse(path)
@@ -330,7 +330,7 @@ class RawDataPreviewWidget(QWidget):
                 graph_message = t("qt.waveform.graph_status", x_name=signal.x.name, channels=channels)
             except Exception as error:
                 self.plot.set_message(
-                    t("qt.common.this_csv_cannot_be_read_with_the_current")
+                    t("qt.waveform.pack_read_error")
                 )
                 graph_message = t("qt.waveform.graph_read_error", error=error)
 
@@ -368,7 +368,7 @@ class SignalPlotWidget(QWidget):
 
         if not MPL_AVAILABLE:
             self.message_label = QLabel(
-                t("qt.common.matplotlib_is_required_for_high_quality_graph_display_48f02c")
+                t("qt.waveform.mpl_install_hint")
             )
             self.message_label.setWordWrap(True)
             self.message_label.setStyleSheet(
@@ -387,7 +387,7 @@ class SignalPlotWidget(QWidget):
         self.click_label.setStyleSheet("color: #667085; font-size: 11px;")
         layout.addWidget(self.click_label)
         self.canvas.mpl_connect("button_press_event", self.on_plot_clicked)
-        self.set_message(t("qt.common.select_a_csv_file_to_display_a_matplotlib"))
+        self.set_message(t("qt.waveform.select_csv_prompt"))
 
     def set_signal(
         self,
@@ -401,7 +401,7 @@ class SignalPlotWidget(QWidget):
         if not MPL_AVAILABLE:
             return
         if signal is None:
-            self.set_message(t("qt.common.select_a_csv_file_to_display_a_matplotlib"))
+            self.set_message(t("qt.waveform.select_csv_prompt"))
             return
         self.draw_signal(
             signal,
@@ -459,12 +459,12 @@ class SignalPlotWidget(QWidget):
             if name in all_channels and all_channels[name].values
         ]
         if not x_values or not channels:
-            self.set_message(t("qt.common.there_is_no_numeric_data_to_graph"))
+            self.set_message(t("qt.waveform.no_numeric_data"))
             return
 
         min_len = min([len(x_values), *(len(channel.values) for channel in channels)])
         if min_len < 2:
-            self.set_message(t("qt.common.there_is_not_enough_numeric_data_to_graph"))
+            self.set_message(t("qt.waveform.insufficient_numeric_data"))
             return
 
         x_values = x_values[:min_len]
@@ -474,7 +474,7 @@ class SignalPlotWidget(QWidget):
         self.click_offset = offset
         if spm is not None:
             self.click_label.setText(
-                t("qt.common.click_the_graph_to_copy_the_corresponding_csv")
+                t("qt.waveform.click_copy_hint")
             )
         else:
             self.click_label.setText("")

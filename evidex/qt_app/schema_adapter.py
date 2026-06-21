@@ -92,7 +92,7 @@ class SchemaAdapterMixin:
 
         self._channel_table = QTableWidget()
         self._channel_table.setColumnCount(3)
-        self._channel_table.setHorizontalHeaderLabels([t("qt.common.use"), t("schema_editor.channel_column"), t("schema_editor.channel_unit")])
+        self._channel_table.setHorizontalHeaderLabels([t("qt.schema.use"), t("schema_editor.channel_column"), t("schema_editor.channel_unit")])
         self._channel_table.horizontalHeader().setStretchLastSection(True)
         self._channel_table.setColumnWidth(0, 40)
         self._channel_table.setColumnWidth(1, 200)
@@ -215,7 +215,7 @@ class SchemaAdapterMixin:
         except Exception as error:
             QMessageBox.critical(
                 self,
-                t("qt.common.read_error"),
+                t("qt.msg.read_error"),
                 str(error),
             )
             return False
@@ -365,12 +365,12 @@ class SchemaAdapterMixin:
                 signal = parse_with_config(path, self._adapter)
             QMessageBox.information(
                 self,
-                t("qt.common.test_successful"),
+                t("qt.msg.test_success"),
                 t("qt.schema_adapter.test_success", points=len(signal.x.values), channels=len(signal.channels)),
             )
         except Exception as error:
             QMessageBox.critical(
                 self,
-                t("qt.common.test_failed"),
+                t("qt.msg.test_failed"),
                 str(error),
             )

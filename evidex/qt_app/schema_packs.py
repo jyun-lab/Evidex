@@ -57,7 +57,7 @@ class SchemaPacksMixin:
         except Exception as error:
             QMessageBox.critical(
                 self,
-                t("qt.common.read_error"),
+                t("qt.msg.read_error"),
                 str(error),
             )
             return
@@ -239,7 +239,7 @@ class SchemaPacksMixin:
                 self._settings.set("active_pack", name)
                 QMessageBox.information(
                     self,
-                    t("qt.common.settings_changed"),
+                    t("qt.msg.settings_changed"),
                     t("schema_editor.restart_to_apply"),
                 )
             self._refresh_pack_list(name)
@@ -274,7 +274,7 @@ class SchemaPacksMixin:
         except Exception as error:
             QMessageBox.critical(
                 self,
-                t("qt.common.create_error"),
+                t("qt.msg.create_error"),
                 str(error),
             )
 
@@ -296,7 +296,7 @@ class SchemaPacksMixin:
         except Exception as error:
             QMessageBox.critical(
                 self,
-                t("qt.common.duplicate_error"),
+                t("qt.msg.duplicate_error"),
                 str(error),
             )
 
@@ -327,6 +327,6 @@ class SchemaPacksMixin:
         except Exception as error:
             QMessageBox.critical(
                 self,
-                t("qt.common.delete_error"),
+                t("qt.msg.delete_error"),
                 str(error),
             )

@@ -46,7 +46,7 @@ class DetailPopoutWindow(QMainWindow):
         super().__init__(parent)
         self.owner = parent
         self.idx = idx
-        self.setWindowTitle(t("qt.common.experiment_record_details"))
+        self.setWindowTitle(t("qt.popout.title"))
         self.resize(720, 700)
         self.setMinimumSize(560, 480)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, True)
@@ -152,7 +152,7 @@ class DetailPopoutWindow(QMainWindow):
             self.close()
             return
 
-        run_id = row.get("run_id", "") or t("qt.common.no_id_fe1a8f")
+        run_id = row.get("run_id", "") or t("qt.common.no_id")
         self.setWindowTitle(f"{run_id} — Evidex")
         self.run_id_label.setText(run_id)
         if feature_enabled("grading"):
