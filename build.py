@@ -6,9 +6,10 @@ Run from the repository root:
     python -m pip install pyinstaller ttkbootstrap matplotlib
     python build.py
 
-The build output is written to dist/Evidex.exe. Build artifacts are intentionally
-excluded from Git.
+Use --qt to build the Qt version and --version to include a version in the
+executable name. Build artifacts are intentionally excluded from Git.
 """
+import argparse
 import os
 import subprocess
 import sys
@@ -18,6 +19,31 @@ from evidex.core.windows import read_ico_sizes
 HERE = os.path.dirname(os.path.abspath(__file__))
 SEP = ";" if os.name == "nt" else ":"
 
+parser = argparse.ArgumentParser(description="Build Evidex Windows executable")
+parser.add_argument(
+    "--qt",
+    action="store_true",
+    help="Build Qt version instead of tkinter",
+)
+parser.add_argument(
+    "--version",
+    default=None,
+    help="Version string for exe name (e.g. 1.0.0)",
+)
+args = parser.parse_args()
+
+if args.qt:
+    entry_point = os.path.join(HERE, "evidex_qt_app.py")
+    exe_name = "Evidex-Qt"
+    hidden_imports = []
+else:
+    entry_point = os.path.join(HERE, "evidex_app.py")
+    exe_name = "Evidex"
+    hidden_imports = ["PIL._tkinter_finder"]
+
+if args.version:
+    exe_name = f"{exe_name}-{args.version}"
+
 
 def fail(message):
     print(f"[ERROR] {message}")
@@ -26,17 +52,18 @@ def fail(message):
 
 # A GUI build without Tcl/Tk produces an EXE that exits immediately. Detect that
 # before PyInstaller overwrites a previously working build.
-try:
-    import tkinter as tk
+if not args.qt:
+    try:
+        import tkinter as tk
 
-    tcl = tk.Tcl()
-    tcl.eval("info patchlevel")
-except Exception as exc:
-    fail(
-        "This Python installation does not include a usable Tcl/Tk. "
-        "Install Python from python.org with the optional Tcl/Tk component, "
-        f"then run build.py again. Details: {exc}"
-    )
+        tcl = tk.Tcl()
+        tcl.eval("info patchlevel")
+    except Exception as exc:
+        fail(
+            "This Python installation does not include a usable Tcl/Tk. "
+            "Install Python from python.org with the optional Tcl/Tk component, "
+            f"then run build.py again. Details: {exc}"
+        )
 
 ADD_DATA = ["README.md"]
 LEGACY_FILES = {
@@ -71,12 +98,13 @@ cmd = [
     "--onefile",
     "--noconsole",
     "--name",
-    "Evidex",
+    exe_name,
     "--icon",
     ICON,
-    "--hidden-import",
-    "PIL._tkinter_finder",
 ]
+
+for hidden_import in hidden_imports:
+    cmd += ["--hidden-import", hidden_import]
 
 for name in ADD_DATA:
     path = os.path.join(HERE, name)
@@ -93,7 +121,7 @@ cmd += [
     "--add-data",
     f"{os.path.join(HERE, 'evidex', 'locales')}{SEP}evidex{os.sep}locales",
 ]
-cmd.append(os.path.join(HERE, "evidex_app.py"))
+cmd.append(entry_point)
 
 print("Running:", " ".join(cmd))
 raise SystemExit(subprocess.call(cmd))
