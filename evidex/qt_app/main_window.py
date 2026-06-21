@@ -1,10 +1,8 @@
 import sys
 from pathlib import Path
 
-from PySide6.QtCore import Qt, QUrl
+from PySide6.QtCore import Qt
 from PySide6.QtGui import (
-    QColor,
-    QDesktopServices,
     QKeySequence,
     QShortcut,
 )
@@ -18,12 +16,10 @@ from PySide6.QtWidgets import (
     QFormLayout,
     QFrame,
     QGridLayout,
-    QHeaderView,
     QHBoxLayout,
     QLabel,
     QLineEdit,
     QMainWindow,
-    QMenu,
     QMessageBox,
     QPushButton,
     QScrollArea,
@@ -31,12 +27,10 @@ from PySide6.QtWidgets import (
     QSplitter,
     QTabWidget,
     QTableWidget,
-    QTableWidgetItem,
     QVBoxLayout,
     QWidget,
 )
 
-from evidex.core.attachments import split_paths
 from evidex.core.fields import (
     CHOICES,
     FACETS,
@@ -44,32 +38,25 @@ from evidex.core.fields import (
     STEP_FORM,
     feature_enabled,
 )
-from evidex.core.i18n import t
-from evidex.core.record_table import (
-    default_new_record,
-    load_record_table,
-    resolve_record_file_path,
-    row_values,
-    save_record_rows,
-    validate_record_update,
-)
-from evidex.core.series_table import load_series_table
-from evidex.core.steps_table import load_steps_table
 
-from .dialogs import (
-    RecordEditDialog,
-    SeriesManagerDialog,
-    StepsEditorDialog,
-)
 from .detail import DetailMixin
 from .filtering import FilterMixin
 from .navigation import NavigationMixin
-from .popout import DetailPopoutWindow
-from .theme import _DARK, _LIGHT
+from .record_ops import RecordOpsMixin
+from .table_view import TableMixin
+from .theming import ThemeMixin
 from .widgets import ElidingButton, ScrollSafeComboBox
 
 
-class EvidexQtWindow(QMainWindow, DetailMixin, NavigationMixin, FilterMixin):
+class EvidexQtWindow(
+    QMainWindow,
+    DetailMixin,
+    NavigationMixin,
+    FilterMixin,
+    ThemeMixin,
+    TableMixin,
+    RecordOpsMixin,
+):
     def __init__(self):
         super().__init__()
         from evidex.core import settings as app_settings
@@ -551,228 +538,11 @@ class EvidexQtWindow(QMainWindow, DetailMixin, NavigationMixin, FilterMixin):
         nav_width = 190 if FACETS and self.nav_panel.isVisible() else 0
         self.splitter.setSizes([nav_width, 720, 340])
 
-    def _theme(self):
-        """現在のテーマカラー辞書を返す"""
-        return _DARK if self.dark else _LIGHT
-
     def _get_columns(self):
         """現在の記録テーブルの列情報を返す"""
         if self.record_table is None:
             return []
         return self.record_table.columns
-
-    def _apply_theme(self):
-        """テーマに応じて主要ウィジェットのスタイルを更新する"""
-        t = self._theme()
-
-        # グローバルスタイル — 子ウィジェットにカスケードする
-        self.setStyleSheet(f"""
-            QMainWindow {{ background: {t['bg']}; color: {t['text']}; }}
-            QDialog {{ background: {t['bg']}; color: {t['text']}; }}
-            QLabel {{ color: {t['text']}; }}
-            QLineEdit {{ background: {t['bg']}; color: {t['text']};
-                         border: 1px solid {t['border']}; padding: 4px; }}
-            QComboBox {{ background: {t['bg']}; color: {t['text']};
-                         border: 1px solid {t['border']}; }}
-            QComboBox QAbstractItemView {{ background: {t['bg']}; color: {t['text']}; }}
-            QCheckBox {{ color: {t['text']}; }}
-            QPushButton {{ background: {t['bg']}; color: {t['text']};
-                           border: 1px solid {t['border']}; padding: 4px 12px;
-                           border-radius: 4px; }}
-            QPushButton:hover {{ background: {t['hover']}; }}
-            QScrollArea {{ background: {t['bg']}; border: none; }}
-            QScrollBar:vertical {{ background: {t['bg_alt']}; width: 8px; }}
-            QScrollBar::handle:vertical {{ background: {t['border']}; border-radius: 4px; }}
-            QScrollBar:horizontal {{ background: {t['bg_alt']}; height: 8px; }}
-            QScrollBar::handle:horizontal {{ background: {t['border']}; border-radius: 4px; }}
-            QMenuBar {{ background: {t['bg']}; color: {t['text']}; }}
-            QMenuBar::item:selected {{ background: {t['hover']}; }}
-            QMenu {{ background: {t['bg']}; color: {t['text']};
-                     border: 1px solid {t['border']}; }}
-            QMenu::item:selected {{ background: {t['selection']}; color: {t['selection_text']}; }}
-            QSplitter::handle {{ background: {t['border_light']}; }}
-        """)
-
-        # テーブル
-        self.table.setStyleSheet(f"""
-            QTableWidget {{
-                background: {t['bg']};
-                gridline-color: {t['border']};
-                alternate-background-color: {t['bg_surface']};
-                selection-background-color: {t['selection']};
-                selection-color: {t['selection_text']};
-                color: {t['text']};
-            }}
-            QTableWidget::item {{ padding: 5px; }}
-            QTableWidget::item:selected {{
-                background-color: {t['selection']};
-                color: {t['selection_text']};
-                border-top: 1px solid {t['selection_border']};
-                border-bottom: 1px solid {t['selection_border']};
-            }}
-            QTableWidget::item:selected:!active {{
-                background-color: {t['selection_inactive']};
-                color: {t['selection_text']};
-            }}
-            QHeaderView::section {{
-                background: {t['header_bg']};
-                border: 1px solid {t['border']};
-                padding: 6px; font-weight: 600;
-                color: {t['text']};
-            }}
-        """)
-
-        # ナビパネル
-        if hasattr(self, "nav_panel"):
-            self.nav_panel.setStyleSheet(f"""
-                QWidget#navPanel {{
-                    border-right: 1px solid {t['nav_border']};
-                    background: {t['nav_bg']};
-                }}
-            """)
-
-        # ☰ ボタン
-        if hasattr(self, "nav_toggle_button"):
-            self.nav_toggle_button.setStyleSheet(f"""
-                QPushButton {{
-                    border: 1px solid {t['border']}; border-radius: 5px;
-                    background: {t['bg']}; color: {t['text']}; font-size: 14px;
-                }}
-                QPushButton:hover {{ background: {t['hover']}; }}
-            """)
-
-        # 詳細タブ
-        if hasattr(self, "detail_tabs"):
-            self.detail_tabs.setStyleSheet(f"""
-                QTabWidget::pane {{
-                    border: 1px solid {t['border']};
-                    background: {t['bg']};
-                }}
-                QTabBar::tab {{
-                    padding: 7px 12px; color: {t['text_muted']};
-                    background: {t['bg_alt']};
-                }}
-                QTabBar::tab:selected {{
-                    background: {t['bg']};
-                    border: 1px solid {t['border']};
-                    border-bottom-color: {t['bg']};
-                    font-weight: 600; color: {t['text']};
-                }}
-            """)
-
-        # 詳細パネルタイトル
-        if hasattr(self, "detail_title"):
-            self.detail_title.setStyleSheet(
-                f"font-weight: 700; color: {t['text']};"
-            )
-
-        # フィルタ関連
-        if hasattr(self, "filter_status_bar"):
-            self.filter_status_bar.setStyleSheet(
-                f"background: {t['bg_surface']}; padding: 4px 10px;"
-                f" border-radius: 4px; color: {t['text_muted']};"
-            )
-        if hasattr(self, "count_label"):
-            self.count_label.setStyleSheet(f"color: {t['text_muted']};")
-        if hasattr(self, "preset_save_btn"):
-            self.preset_save_btn.setStyleSheet(
-                f"QPushButton {{ border: 1px solid {t['border']}; "
-                f"border-radius: 3px; padding: 2px 6px; "
-                f"background: {t['bg_surface']}; color: {t['text']}; }}"
-                f"QPushButton:hover {{ background: {t['hover']}; }}"
-            )
-        if hasattr(self, "adv_toggle_button"):
-            self.adv_toggle_button.setStyleSheet(
-                f"QPushButton {{ border: none; color: {t['link']}; font-weight: 600; }}"
-            )
-
-        # ポップアウトボタン
-        if hasattr(self, "popout_button"):
-            self.popout_button.setStyleSheet(f"""
-                QPushButton {{
-                    border: none; color: {t['link']};
-                    font-weight: 600; font-size: 12px; background: transparent;
-                }}
-                QPushButton:hover {{ color: {t['selection_border']}; text-decoration: underline; }}
-                QPushButton:disabled {{ color: {t['text_muted']}; }}
-            """)
-
-        # 削除ボタン（赤は維持）
-        if hasattr(self, "delete_button"):
-            self.delete_button.setStyleSheet(f"""
-                QPushButton {{
-                    color: #B42318; border-color: #FDA29B;
-                    background: {t['bg']};
-                }}
-                QPushButton:hover {{ background: {t['hover']}; }}
-                QPushButton:disabled {{ color: #98A2B3; border-color: #D0D5DD; }}
-            """)
-
-        # ヘッダーラベル
-        if hasattr(self, "title_label"):
-            self.title_label.setStyleSheet(
-                f"font-size: 20px; font-weight: 700; color: {t['text']};"
-            )
-        if hasattr(self, "note_label"):
-            self.note_label.setStyleSheet(f"color: {t['text_muted']};")
-
-        # フィルタラベル
-        for lbl in getattr(self, "_filter_labels", []):
-            lbl.setStyleSheet(f"color: {t['text_muted']}; font-weight: 600;")
-
-        # ナビパネル再描画
-        if self.record_table is not None:
-            self.build_nav()
-        self._apply_grade_row_colors()
-        self.show_selected_record()
-
-    def _apply_grade_row_colors(self):
-        """テーブル行にGradeベースの背景色を適用する"""
-        grade_colors = self._theme()["grade_row"]
-        grade_col = None
-        for column_index, column in enumerate(self._get_columns()):
-            if column.key == "grade":
-                grade_col = column_index
-                break
-        if grade_col is None:
-            return
-        for row_index in range(self.table.rowCount()):
-            item = self.table.item(row_index, grade_col)
-            if item is None:
-                continue
-            grade = item.text().strip().upper()
-            if grade in grade_colors:
-                background = QColor(grade_colors[grade])
-                for column_index in range(self.table.columnCount()):
-                    cell = self.table.item(row_index, column_index)
-                    if cell is not None:
-                        cell.setBackground(background)
-
-    def _card_qss(self, name="card"):
-        """カード型QFrameのテーマ対応スタイル"""
-        t = self._theme()
-        return f"""QFrame#{name} {{
-            border: 1px solid {t['border']};
-            border-radius: 8px; background: {t['bg']};
-        }}"""
-
-    def _muted_ss(self):
-        return f"color: {self._theme()['text_muted']};"
-
-    def _muted_bold_ss(self):
-        return f"color: {self._theme()['text_muted']}; font-weight: 600;"
-
-    def toggle_theme(self):
-        """ダーク/ライトテーマを切り替える"""
-        self.dark = not self.dark
-        self._apply_theme()
-
-    def _menu_toggle_theme(self):
-        self.toggle_theme()
-        if hasattr(self, "dark_action"):
-            self.dark_action.setChecked(self.dark)
-        from evidex.core import settings as app_settings
-        app_settings.set("theme", "dark" if self.dark else "light")
 
     def open_settings(self):
         """設定ダイアログを表示する"""
@@ -876,416 +646,6 @@ class EvidexQtWindow(QMainWindow, DetailMixin, NavigationMixin, FilterMixin):
             from evidex.core import config
             config.RECORDS_CSV = Path(path)
             self.reload_records()
-
-    def reload_records(self):
-        try:
-            self.record_table = load_record_table()
-        except Exception as error:
-            QMessageBox.critical(self, "読み込みエラー", str(error))
-            return
-
-        self.steps_by_run = {}
-        if self.steps_enabled:
-            try:
-                self.steps_by_run, _sf, _sm = load_steps_table(
-                    self.record_table.records_csv
-                )
-            except Exception:
-                self.steps_by_run = {}
-
-        self.series_rows = []
-        if self.series_enabled:
-            try:
-                self.series_rows, _sf, _sm = load_series_table(
-                    self.record_table.records_csv
-                )
-            except Exception:
-                self.series_rows = []
-
-        self._refresh_filter_choices()
-        self.apply_search()
-        self._refresh_presets()
-        self.build_nav()
-
-    def populate_table(self):
-        columns = self.record_table.columns
-        self.table.setSortingEnabled(False)
-        self.table.blockSignals(True)
-        self.table.clear()
-        self.table.setColumnCount(len(columns))
-        self.table.setRowCount(len(self.filtered_rows))
-        self.table.setHorizontalHeaderLabels([column.label for column in columns])
-
-        for column_index, column in enumerate(columns):
-            self.table.setColumnWidth(column_index, column.width)
-
-        grade_col_index = None
-        for ci, col in enumerate(columns):
-            if col.key == "grade":
-                grade_col_index = ci
-                break
-
-        for row_index, row in enumerate(self.filtered_rows):
-            try:
-                source_index = self.record_table.rows.index(row)
-            except ValueError:
-                continue
-            values = row_values(row, columns)
-            grade_value = (row.get("grade", "") or "").strip().upper()
-            grade_color = GCOL.get(grade_value) if grade_value else None
-            for column_index, value in enumerate(values):
-                item = QTableWidgetItem(str(value))
-                item.setToolTip(str(value))
-                item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
-                if column_index == 0:
-                    item.setData(Qt.ItemDataRole.UserRole, source_index)
-                if grade_color and column_index == grade_col_index:
-                    item.setForeground(QColor(grade_color))
-                self.table.setItem(row_index, column_index, item)
-
-        header = self.table.horizontalHeader()
-        stretch_keys = {"title", "result_summary", "notes"}
-        for column_index, column in enumerate(columns):
-            if column.key in stretch_keys:
-                header.setSectionResizeMode(
-                    column_index, QHeaderView.ResizeMode.Stretch
-                )
-            else:
-                header.setSectionResizeMode(
-                    column_index, QHeaderView.ResizeMode.Interactive
-                )
-        header.setStretchLastSection(False)
-        self.table.setSortingEnabled(True)
-        self._apply_grade_row_colors()
-        total = len(self.record_table.rows)
-        shown = len(self.filtered_rows)
-        query = self.search_input.text().strip()
-        if query or self.nav_view is not None:
-            self.count_label.setText(f"{shown} / {total} 件")
-        else:
-            self.count_label.setText(f"{total} 件")
-        self.statusBar().showMessage(
-            f"{self.record_table.records_csv}  |  {shown} / {total} 件"
-        )
-        if self.filtered_rows:
-            self.table.selectRow(0)
-        else:
-            self.show_empty_detail()
-        self.table.blockSignals(False)
-        if self.filtered_rows:
-            self.show_selected_record()
-
-    def _filtered_index_for_table_row(self, table_row):
-        if self.record_table is None or not (0 <= table_row < self.table.rowCount()):
-            return None
-        first_item = self.table.item(table_row, 0)
-        source_index = (
-            first_item.data(Qt.ItemDataRole.UserRole)
-            if first_item is not None
-            else None
-        )
-        try:
-            source_row = self.record_table.rows[int(source_index)]
-        except (TypeError, ValueError, IndexError):
-            return None
-        for index, row in enumerate(self.filtered_rows):
-            if row is source_row:
-                return index
-        try:
-            return self.filtered_rows.index(source_row)
-        except ValueError:
-            return None
-
-    def _on_table_double_click(self, model_index):
-        index = self._filtered_index_for_table_row(model_index.row())
-        if index is not None:
-            self.open_detail(index)
-
-    def _show_context_menu(self, pos):
-        item = self.table.itemAt(pos)
-        if item is None:
-            return
-        self.table.selectRow(item.row())
-        self.show_selected_record()
-
-        menu = QMenu(self)
-        menu.addAction("詳細を開く", self._open_selected_detail)
-        menu.addAction("記録を編集", self.edit_selected_record)
-        if self.steps_enabled:
-            menu.addAction("工程を編集", self.edit_selected_steps)
-        menu.addSeparator()
-        menu.addAction(
-            "raw_path を開く",
-            lambda: self._open_selected_path("raw_path"),
-        )
-        menu.addAction(
-            "excel_path を開く",
-            lambda: self._open_selected_path("excel_path"),
-        )
-        menu.addAction("パスをコピー", self._copy_selected_paths)
-        menu.addSeparator()
-        menu.addAction("削除", self.delete_selected_record)
-        menu.exec(self.table.viewport().mapToGlobal(pos))
-
-    def _open_selected_path(self, column):
-        if self.current_row is None:
-            return
-        paths = split_paths(self.current_row.get(column, ""))
-        if not paths:
-            QMessageBox.information(
-                self,
-                "情報",
-                f"{column} にファイルが登録されていません。",
-            )
-            return
-        resolved = resolve_record_file_path(
-            paths[0],
-            records_csv=self.record_table.records_csv,
-        )
-        if resolved.exists():
-            QDesktopServices.openUrl(
-                QUrl.fromLocalFile(str(resolved))
-            )
-        else:
-            QMessageBox.warning(
-                self,
-                "ファイルが見つかりません",
-                str(resolved),
-            )
-
-    def _copy_selected_paths(self):
-        if self.current_row is None:
-            return
-        paths = split_paths(self.current_row.get("raw_path", ""))
-        if paths:
-            QApplication.clipboard().setText("\n".join(paths))
-            self.statusBar().showMessage(
-                f"パスをコピーしました ({len(paths)} 件)",
-                3000,
-            )
-        else:
-            QMessageBox.information(self, "情報", "raw_path が空です。")
-
-    def _open_selected_detail(self):
-        selected = self.table.selectionModel().selectedRows()
-        if not selected:
-            return
-        index = self._filtered_index_for_table_row(selected[0].row())
-        if index is not None:
-            self.open_detail(index)
-
-    def open_detail(self, idx):
-        if not (0 <= idx < len(self.filtered_rows)):
-            return
-        window = DetailPopoutWindow(self, idx)
-        self._detail_windows.append(window)
-        window.destroyed.connect(
-            lambda _object=None, detail_window=window:
-            self._forget_detail_window(detail_window)
-        )
-        window.show()
-
-    def _forget_detail_window(self, window):
-        if window in self._detail_windows:
-            self._detail_windows.remove(window)
-
-    def edit_run(self, row):
-        self.current_row = row
-        self.edit_selected_record()
-
-    def open_steps_editor(self, run_id):
-        if self.record_table is None:
-            return
-        row = next(
-            (
-                item for item in self.record_table.rows
-                if item.get("run_id", "") == run_id
-            ),
-            None,
-        )
-        if row is None:
-            return
-        self.current_row = row
-        self.edit_selected_steps()
-
-    def edit_selected_record(self):
-        if self.current_row is None or self.record_table is None:
-            QMessageBox.information(
-                self,
-                "実験記録を編集",
-                "編集する実験記録を選択してください。",
-            )
-            return
-        dialog = RecordEditDialog(
-            self.current_row,
-            self.record_table.fields,
-            self,
-            base_dir=self.record_table.records_csv.parent,
-            title=f"実験記録を編集: {self.current_row.get('run_id', '')}",
-            series_choices=self._known_series(),
-        )
-        if dialog.exec() != QDialog.DialogCode.Accepted:
-            return
-        updated = dialog.values()
-        original = dict(self.current_row)
-        try:
-            validate_record_update(
-                self.current_row,
-                updated,
-                self.record_table.rows,
-            )
-            self.current_row.update(updated)
-            save_record_rows(
-                self.record_table.records_csv,
-                self.record_table.rows,
-                self.record_table.fields,
-                self.record_table.mtime,
-            )
-        except Exception as error:
-            self.current_row.clear()
-            self.current_row.update(original)
-            QMessageBox.critical(self, "保存エラー", str(error))
-            return
-        selected_run_id = updated.get("run_id", "")
-        self.reload_records()
-        self.select_run_id(selected_run_id)
-        self.statusBar().showMessage(
-            f"実験記録「{selected_run_id}」を保存しました。", 5000
-        )
-
-    def add_new_record(self):
-        if self.record_table is None:
-            return
-        row = default_new_record(
-            self.record_table.rows,
-            self.record_table.fields,
-        )
-        dialog = RecordEditDialog(
-            row,
-            self.record_table.fields,
-            self,
-            base_dir=self.record_table.records_csv.parent,
-            title="新しい実験記録を追加",
-            series_choices=self._known_series(),
-        )
-        if dialog.exec() != QDialog.DialogCode.Accepted:
-            return
-        updated = dialog.values()
-        try:
-            validate_record_update(
-                None,
-                updated,
-                self.record_table.rows,
-            )
-            self.record_table.rows.append(updated)
-            save_record_rows(
-                self.record_table.records_csv,
-                self.record_table.rows,
-                self.record_table.fields,
-                self.record_table.mtime,
-            )
-        except Exception as error:
-            if updated in self.record_table.rows:
-                self.record_table.rows.remove(updated)
-            QMessageBox.critical(self, "保存エラー", str(error))
-            return
-        selected_run_id = updated.get("run_id", "")
-        self.reload_records()
-        self.select_run_id(selected_run_id)
-        self.statusBar().showMessage(
-            f"実験記録「{selected_run_id}」を追加しました。", 5000
-        )
-
-    def delete_selected_record(self):
-        if self.current_row is None or self.record_table is None:
-            QMessageBox.information(
-                self,
-                "実験記録を削除",
-                "削除する実験記録を選択してください。",
-            )
-            return
-        run_id = self.current_row.get("run_id", "") or "(IDなし)"
-        answer = QMessageBox.question(
-            self,
-            "実験記録を削除",
-            f"実験記録「{run_id}」を削除しますか？\n\n"
-            "この操作は runs.csv から記録を削除します。\n"
-            "削除前のCSVは backup フォルダに保存されます。",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.No,
-        )
-        if answer != QMessageBox.StandardButton.Yes:
-            return
-
-        row = self.current_row
-        try:
-            self.record_table.rows.remove(row)
-            save_record_rows(
-                self.record_table.records_csv,
-                self.record_table.rows,
-                self.record_table.fields,
-                self.record_table.mtime,
-            )
-        except Exception as error:
-            if row not in self.record_table.rows:
-                self.record_table.rows.append(row)
-            QMessageBox.critical(self, "削除エラー", str(error))
-            return
-
-        self.reload_records()
-        self.statusBar().showMessage(
-            f"実験記録「{run_id}」を削除しました。", 5000
-        )
-
-    def edit_selected_steps(self):
-        if self.current_row is None or self.record_table is None:
-            QMessageBox.information(
-                self,
-                "工程を編集",
-                "工程を編集する実験記録を選択してください。",
-            )
-            return
-        run_id = self.current_row.get("run_id", "").strip()
-        if not run_id:
-            QMessageBox.information(
-                self,
-                "工程を編集",
-                "run_id がない記録の工程は編集できません。",
-            )
-            return
-        dialog = StepsEditorDialog(
-            run_id,
-            self.record_table.records_csv,
-            self,
-        )
-        if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.statusBar().showMessage(
-                f"工程「{run_id}」を保存しました。", 5000
-            )
-
-    def open_series_manager(self):
-        if self.record_table is None:
-            return
-        dialog = SeriesManagerDialog(self.record_table, self)
-        dialog.target_run_id = ""
-        dialog.series_selected.connect(
-            lambda run_id: setattr(dialog, "target_run_id", run_id)
-        )
-        if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.reload_records()
-            if getattr(dialog, "target_run_id", ""):
-                self.select_run_id(dialog.target_run_id)
-            self.statusBar().showMessage("シリーズ管理の変更を反映しました。", 5000)
-
-    def select_run_id(self, run_id):
-        if not run_id:
-            return
-        for row_index, row in enumerate(self.filtered_rows):
-            if row.get("run_id", "") == run_id:
-                self.table.selectRow(row_index)
-                self.show_selected_record()
-                return
-
 
 def run(argv=None):
     app = QApplication(list(argv) if argv is not None else sys.argv)
