@@ -8,6 +8,7 @@ from evidex.core.backup import prune_backups
 from evidex.core.csvio import ensure_initial_csv_files, load_with_header
 from evidex.core.fields import STEP_FIELDS, STEP_FORM, get_label
 from evidex.core.filtering import fnum
+from evidex.core.fsio import atomic_write
 from evidex.core.i18n import t
 
 
@@ -51,7 +52,7 @@ def save_steps_table(records_csv, steps_by_run, fields, previous_mtime=None):
         if field not in output_fields:
             output_fields.append(field)
 
-    with path.open("w", newline="", encoding="utf-8-sig") as handle:
+    with atomic_write(path, newline="", encoding="utf-8-sig") as handle:
         writer = csv.DictWriter(handle, fieldnames=output_fields)
         writer.writeheader()
         for run_id in sorted(steps_by_run):

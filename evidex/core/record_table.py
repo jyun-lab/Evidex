@@ -10,6 +10,7 @@ from evidex.core import config, fields
 from evidex.core.attachments import split_paths
 from evidex.core.backup import prune_backups
 from evidex.core.csvio import ensure_initial_csv_files, load_with_header
+from evidex.core.fsio import atomic_write
 
 
 @dataclass(frozen=True)
@@ -83,7 +84,7 @@ def save_record_rows(records_csv, rows, fields, previous_mtime=None):
         shutil.copy2(path, backup_dir / f"runs-{stamp}.csv")
         prune_backups(backup_dir)
 
-    with path.open("w", newline="", encoding="utf-8-sig") as handle:
+    with atomic_write(path, newline="", encoding="utf-8-sig") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields)
         writer.writeheader()
         for row in rows:

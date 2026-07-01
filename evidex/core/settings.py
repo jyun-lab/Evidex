@@ -2,6 +2,7 @@ import json
 import os
 from pathlib import Path
 from evidex.core import config
+from evidex.core.fsio import atomic_write
 
 DEFAULTS = {
     "active_pack": config.DEFAULT_PACK,
@@ -46,7 +47,7 @@ def set(key, value):
         data = _load()
         data[key] = value
         path = _settings_path()
-        with path.open("w", encoding="utf-8") as f:
+        with atomic_write(path, encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=1)
         return True
     except Exception:

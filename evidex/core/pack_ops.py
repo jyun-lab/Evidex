@@ -9,6 +9,7 @@ import shutil
 from pathlib import Path
 
 from evidex.core import config
+from evidex.core.fsio import atomic_write
 from evidex.core.i18n import t
 from evidex.core.schema import load_schema, pack_resource_dir
 from evidex.packs import get_pack_names, registry
@@ -123,10 +124,8 @@ def validate_schema(schema):
 
 def _write_json(path, data):
     path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_suffix(path.suffix + ".tmp")
-    with tmp.open("w", encoding="utf-8") as handle:
+    with atomic_write(path, encoding="utf-8") as handle:
         json.dump(data, handle, indent=2, ensure_ascii=False)
-    tmp.replace(path)
 
 
 def save_user_pack(pack_name, schema, adapter=None, viz=None):

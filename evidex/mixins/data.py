@@ -14,6 +14,7 @@ from ..core.backup import prune_backups
 from ..core.attachments import join_paths, split_paths
 from ..core.csvio import ensure_initial_csv_files, parse_device_csv, load_with_header, load_steps_with_header, STEP_FIELDS, SERIES_FIELDS
 from ..core.filtering import norm, fnum, row_matches
+from ..core.fsio import atomic_write
 from ..core.icons import icon_for_action, icon_for_liquid, HELP_TEXT
 from ..gui_runtime import THEMED, MPL, tb, bstyle, resolve_tk_font
 from ..components import Tooltip, DatePicker, ScrollFrame
@@ -68,7 +69,7 @@ class DataMixin:
             stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S-%f")
             shutil.copy2(self.path, bdir / f"runs-{stamp}.csv")
             prune_backups(bdir)
-        with open(self.path, "w", newline="", encoding="utf-8-sig") as f:
+        with atomic_write(self.path, newline="", encoding="utf-8-sig") as f:
             w = csv.DictWriter(f, fieldnames=self.fields)
             w.writeheader()
             for r in self.rows:
@@ -155,7 +156,7 @@ class DataMixin:
                 ts = datetime.datetime.now().strftime("%Y%m%d-%H%M%S-%f")
                 shutil.copy2(spath, bdir / f"series-{ts}.csv")
                 prune_backups(bdir)
-            with open(spath, "w", newline="", encoding="utf-8-sig") as f:
+            with atomic_write(spath, newline="", encoding="utf-8-sig") as f:
                 w = csv.DictWriter(f, fieldnames=self.series_fields)
                 w.writeheader()
                 for r in self.series_rows:
