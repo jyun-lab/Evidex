@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- Single version source at `evidex.__version__`
+- `--data`, `EVIDEX_HOME`, and remembered ledger-folder resolution
+- File menu action to choose the ledger folder for the next startup
+- Atomic write helper for ledger CSV, settings JSON, and user-pack JSON files
+- Windows CI job for the public test suite
+
+### Fixed
+
+- Backup pruning now keeps 100 generations independently for each ledger prefix
+- README download links now point to the latest Releases page instead of versioned exe URLs
+- Tests are isolated from local settings and private user packs
+- GUI tests in CI no longer hide failures with `|| true`
+
+### Changed
+
+- Package metadata now reads the version dynamically from `evidex.__version__`
+- Installed-package default ledger location is now `~/Evidex` instead of the package directory
+
 ## [0.2.0] — 2026-06-21
 
 ### Added
