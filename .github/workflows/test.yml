@@ -39,7 +39,7 @@ jobs:
 
       - name: Run GUI tests
         run: |
-          xvfb-run -a python -m pytest tests/test_run_editor_layout.py tests/test_schema_layout.py -v || true
+          xvfb-run -a python -m pytest tests/test_run_editor_layout.py tests/test_schema_layout.py -v
 
   test-qt:
     runs-on: ubuntu-latest
@@ -69,3 +69,24 @@ jobs:
       - name: Run Qt tests
         run: |
           xvfb-run -a python -m pytest tests/test_qt_*.py -v
+
+  test-windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .[tk]
+          pip install pytest
+
+      - name: Run tests
+        run: |
+          python -m pytest tests/ --ignore=tests/accept_test.py -v
