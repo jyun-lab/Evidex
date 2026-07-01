@@ -1,10 +1,12 @@
 import csv
+import re
 import tempfile
 import unittest
 from pathlib import Path
 
 from evidex.core import config
 from evidex.core.fields import STEP_FIELDS, STEP_FORM
+from evidex.core.i18n import t
 from evidex.core.steps_table import (
     load_steps_table,
     save_steps_table,
@@ -57,7 +59,10 @@ class StepsTableTests(unittest.TestCase):
             self.skipTest("current pack has no data row fields")
         step = {"action": "A", "data_start_row": "10", "data_end_row": "3"}
 
-        with self.assertRaisesRegex(ValueError, "開始行"):
+        with self.assertRaisesRegex(
+            ValueError,
+            re.escape(t("steps.validation.start_must_le_end")),
+        ):
             validate_step_update(step)
 
     def test_validate_step_update_rejects_missing_primary_field(self):
