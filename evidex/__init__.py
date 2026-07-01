@@ -2,6 +2,8 @@
 Evidex: A structured laboratory data management GUI.
 """
 
+__version__ = "0.3.0"
+
 __all__ = ["App", "Tooltip", "RUN_FIELDS", "STEP_FIELDS",
            "BUNDLED_ASSETS", "THEMED", "MPL", "_UI_FONT_CANDIDATES",
            "ensure_initial_csv_files", "extract_bundled_assets",

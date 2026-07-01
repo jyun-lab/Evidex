@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "evidex"
-version = "0.2.0"
+dynamic = ["version"]
 description = "Turn scattered lab files into searchable experiment evidence"
 readme = "README.md"
 license = "MIT"
@@ -41,3 +41,6 @@ Issues = "https://github.com/jyun-lab/Evidex/issues"
 [tool.setuptools.packages.find]
 include = ["evidex*"]
 exclude = ["tests*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "evidex.__version__"}

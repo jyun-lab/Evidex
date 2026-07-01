@@ -5,6 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+import evidex
 from evidex.core import config, settings
 from evidex.core.attachments import first_path, join_paths, split_paths
 from evidex.core.media import is_image_path
@@ -36,6 +37,9 @@ class PublicReleaseTests(unittest.TestCase):
         self.assertEqual(config.DEFAULT_PACK, "generic_ts")
         self.assertEqual(registry, {"generic_ts": "evidex.packs.generic_ts"})
         self.assertEqual(active_pack().name, "generic_ts")
+
+    def test_package_version_is_semver(self):
+        self.assertRegex(evidex.__version__, r"^\d+\.\d+\.\d+$")
 
     def test_unknown_pack_falls_back_to_generic(self):
         settings.set("active_pack", "unknown_pack")

@@ -14,6 +14,7 @@ import os
 import subprocess
 import sys
 
+from evidex import __version__
 from evidex.core.windows import read_ico_sizes
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -27,8 +28,10 @@ parser.add_argument(
 )
 parser.add_argument(
     "--version",
+    nargs="?",
+    const=__version__,
     default=None,
-    help="Version string for exe name (e.g. 1.0.0)",
+    help="Version string for exe name (defaults to package version when omitted)",
 )
 args = parser.parse_args()
 

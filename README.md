@@ -14,8 +14,8 @@ No server. No cloud. Just local files and a single EXE.
 
 | Build | Download |
 |---|---|
-| Qt (PySide6) — recommended | [Evidex-Qt-v0.2.0.exe](https://github.com/jyun-lab/Evidex/releases/latest/download/Evidex-Qt-v0.2.0.exe) |
-| tkinter (lightweight) | [Evidex-v0.2.0.exe](https://github.com/jyun-lab/Evidex/releases/latest/download/Evidex-v0.2.0.exe) |
+| Qt (PySide6) — recommended | [Releases page](https://github.com/jyun-lab/Evidex/releases/latest) |
+| tkinter (lightweight) | [Releases page](https://github.com/jyun-lab/Evidex/releases/latest) |
 
 Download, run, done. The bundled demo data lets you explore immediately.
 
@@ -116,7 +116,7 @@ pip install pyinstaller PySide6 matplotlib
 python build.py --qt --version
 ```
 
-Output: `dist/Evidex-v0.2.0.exe` or `dist/Evidex-Qt-v0.2.0.exe`.
+Output: `dist/Evidex-<version>.exe` or `dist/Evidex-Qt-<version>.exe`.
 
 ## License
 

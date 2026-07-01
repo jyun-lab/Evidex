@@ -10,6 +10,7 @@ env/
 
 # Test and coverage output
 .pytest_cache/
+.tmp/
 .coverage
 htmlcov/
 
