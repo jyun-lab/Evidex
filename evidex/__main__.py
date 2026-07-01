@@ -8,7 +8,27 @@ Usage:
 import sys
 
 
+def _consume_data_arg(argv):
+    for index, arg in enumerate(list(argv)):
+        if arg == "--data":
+            if index + 1 >= len(argv):
+                raise SystemExit("--data requires a directory")
+            value = argv[index + 1]
+            del argv[index:index + 2]
+            return value
+        if arg.startswith("--data="):
+            value = arg.split("=", 1)[1]
+            del argv[index]
+            return value
+    return None
+
+
 def main():
+    data_dir = _consume_data_arg(sys.argv)
+    from evidex.core import config
+
+    config.set_base_dir(config.resolve_base_dir(data_dir))
+
     backend = "auto"
     if "--qt" in sys.argv:
         sys.argv.remove("--qt")

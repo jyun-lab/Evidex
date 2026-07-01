@@ -150,7 +150,10 @@ class App(tb.Window if THEMED else tk.Tk, PrefsMixin, ThemeMixin, NavMixin, Sear
         # メニューバー: ファイル操作と表示切替はここに集約
         menubar = tk.Menu(self)
         fmenu = tk.Menu(menubar, tearoff=0)
-        fmenu.add_command(label=t("menu.file.open"), command=self.open_file)
+        fmenu.add_command(
+            label=t("menu.open_ledger_folder"),
+            command=self.open_ledger_folder,
+        )
         fmenu.add_command(label=t("menu.file.reload"), command=lambda: self._load(self.path))
         fmenu.add_separator()
         fmenu.add_command(label=t("menu.file.settings"), command=self.open_settings)

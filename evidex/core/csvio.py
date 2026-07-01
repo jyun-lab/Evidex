@@ -41,7 +41,7 @@ def load_steps_with_header(runs_path):
 
 def ensure_initial_csv_files(base_dir=None):
     if base_dir is None:
-        base_dir = config._base_dir()
+        base_dir = config.RECORDS_CSV.parent
     else:
         base_dir = Path(base_dir)
     base_dir.mkdir(parents=True, exist_ok=True)
@@ -62,7 +62,7 @@ def extract_bundled_assets(base_dir=None):
     if not meipass:
         return []
     if base_dir is None:
-        base_dir = config._base_dir()
+        base_dir = config.RECORDS_CSV.parent
     else:
         base_dir = Path(base_dir)
     src_dir = Path(meipass)

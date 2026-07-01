@@ -1,5 +1,4 @@
 import sys
-from pathlib import Path
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import (
@@ -488,7 +487,10 @@ class EvidexQtWindow(
     def _build_menubar(self):
         menubar = self.menuBar()
         file_menu = menubar.addMenu(t("qt.menu.file"))
-        file_menu.addAction(t("menu.file.open"), self._menu_open_file)
+        file_menu.addAction(
+            t("menu.open_ledger_folder"),
+            self._menu_open_ledger_folder,
+        )
         file_menu.addAction(t("menu.file.reload"), self.reload_records)
         file_menu.addSeparator()
         file_menu.addAction(t("menu.file.settings"), self.open_settings)
@@ -631,17 +633,21 @@ class EvidexQtWindow(
 
         open_schema_editor_dialog(self)
 
-    def _menu_open_file(self):
-        path, _ = QFileDialog.getOpenFileName(
+    def _menu_open_ledger_folder(self):
+        from evidex.core import config
+
+        folder = QFileDialog.getExistingDirectory(
             self,
-            t("qt.main.open_csv"),
-            "",
-            "CSV Files (*.csv);;All Files (*)",
+            t("menu.open_ledger_folder"),
+            str(config.RECORDS_CSV.parent),
         )
-        if path:
-            from evidex.core import config
-            config.RECORDS_CSV = Path(path)
-            self.reload_records()
+        if folder:
+            config.save_last_dir(folder)
+            QMessageBox.information(
+                self,
+                t("dialog.ledger.title"),
+                t("dialog.ledger.msg_reboot"),
+            )
 
 def run(argv=None):
     from evidex.core.csvio import extract_bundled_assets, ensure_initial_csv_files

@@ -1,6 +1,7 @@
 {
   "menu.file": "File",
   "menu.file.open": "Open Ledger...",
+  "menu.open_ledger_folder": "Open Ledger Folder...",
   "menu.file.reload": "Reload",
   "menu.file.settings": "Settings...",
   "menu.file.exit": "Exit",
@@ -19,6 +20,8 @@
   "dialog.settings.theme": "Theme:",
   "dialog.settings.language": "Language (requires restart):",
   "dialog.settings.msg_reboot": "Changes to active pack or language will take effect upon next application start.",
+  "dialog.ledger.title": "Ledger Folder",
+  "dialog.ledger.msg_reboot": "The selected ledger folder will be used the next time Evidex starts.",
   "msg.info": "Info",
   "msg.error": "Error",
   "msg.input_error": "Input Error",

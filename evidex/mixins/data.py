@@ -56,6 +56,20 @@ class DataMixin:
         if p:
             self._load(p)
 
+    def open_ledger_folder(self):
+        folder = filedialog.askdirectory(
+            parent=self,
+            initialdir=str(config.RECORDS_CSV.parent),
+        )
+        if not folder:
+            return
+        config.save_last_dir(folder)
+        messagebox.showinfo(
+            t("dialog.ledger.title"),
+            t("dialog.ledger.msg_reboot"),
+            parent=self,
+        )
+
     def save_evidence(self):
         """バックアップ→書き戻し。Excel等で並行変更されていたら警告。"""
         if self.path.exists() and abs(self.path.stat().st_mtime - self.mtime) > 1e-6:

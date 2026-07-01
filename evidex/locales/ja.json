@@ -1,6 +1,7 @@
 {
   "menu.file": "ファイル",
   "menu.file.open": "台帳を開く...",
+  "menu.open_ledger_folder": "台帳フォルダを開く...",
   "menu.file.reload": "再読込",
   "menu.file.settings": "設定...",
   "menu.file.exit": "終了",
@@ -19,6 +20,8 @@
   "dialog.settings.theme": "テーマ:",
   "dialog.settings.language": "言語 / Language (次回起動で反映):",
   "dialog.settings.msg_reboot": "アクティブパックや言語の変更は、次回アプリ起動時に反映されます。",
+  "dialog.ledger.title": "台帳フォルダ",
+  "dialog.ledger.msg_reboot": "選択した台帳フォルダは、次回Evidexを起動したときに反映されます。",
   "msg.info": "情報",
   "msg.error": "エラー",
   "msg.input_error": "入力エラー",
