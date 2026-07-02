@@ -1,6 +1,7 @@
 import tkinter as tk
 import unittest
 
+from conftest import reset_tk_style_singletons
 from evidex.views.run_editor import FileListEditor
 
 
@@ -14,6 +15,7 @@ class FakeApp:
 
 class RunEditorLayoutTests(unittest.TestCase):
     def setUp(self):
+        reset_tk_style_singletons()
         try:
             self.root = tk.Tk()
         except tk.TclError as error:
@@ -23,6 +25,7 @@ class RunEditorLayoutTests(unittest.TestCase):
     def tearDown(self):
         if hasattr(self, "root"):
             self.root.destroy()
+        reset_tk_style_singletons()
 
     def test_file_list_editor_shows_filenames_and_saves_joined_paths(self):
         app = FakeApp(["signals/b.csv", "figures/result.png"])

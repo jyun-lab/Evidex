@@ -3,6 +3,7 @@ import tkinter as tk
 import unittest
 from pathlib import Path
 
+from conftest import reset_tk_style_singletons
 from evidex.core import config
 from evidex.views.schema_editor import _blank_schema, open_schema_editor, save_user_pack
 
@@ -12,6 +13,7 @@ class SchemaEditorLayoutTests(unittest.TestCase):
         self.original_records_csv = config.RECORDS_CSV
         self.temp_dir = tempfile.TemporaryDirectory()
         config.RECORDS_CSV = Path(self.temp_dir.name) / "runs.csv"
+        reset_tk_style_singletons()
         try:
             self.root = tk.Tk()
         except tk.TclError as error:
@@ -22,6 +24,7 @@ class SchemaEditorLayoutTests(unittest.TestCase):
     def tearDown(self):
         if hasattr(self, "root"):
             self.root.destroy()
+        reset_tk_style_singletons()
         config.RECORDS_CSV = self.original_records_csv
         self.temp_dir.cleanup()
 
